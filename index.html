@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Khách Hàng - anhdulich.vn</title>
+    <style>
+        body { background: #f4f7f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; width: 90%; max-width: 400px; padding: 35px 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+        .icon-folder { font-size: 50px; margin-bottom: 10px; display: inline-block; }
+        h2 { color: #1d1d1f; margin: 0 0 8px 0; font-size: 22px; font-weight: 700; }
+        p { color: #86868b; font-size: 14px; margin: 0 0 30px 0; line-height: 1.4; }
+        .btn-download { display: block; padding: 16px 0; background: #007aff; color: white; text-decoration: none; border-radius: 14px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,122,255,0.25); transition: all 0.2s ease; }
+        .btn-download:hover { background: #0063cc; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <span class="icon-folder">🛡️</span>
+    <h2 id="folder-title">MÃ KHÁCH HÀNG</h2>
+    <p>Trang tải ảnh & video chất lượng cao gốc.<br>Cảm ơn bạn đã lựa chọn anhdulich.vn!</p>
+    
+    <a href="#" id="btn-drive" class="btn-download" target="_blank">📥 XEM & TẢI ALBUM TRÊN DRIVE</a>
+</div>
+
+<script>
+    // Hàm xử lý giải mã chuỗi Web-Safe Base64 ngược lại thành Unicode text gốc
+    function decodeAdvanced(base64) {
+        let str = base64.replace(/-/g, '+').replace(/_/g, '/');
+        while (str.length % 4) { str += '='; }
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+    // 1. Lấy dữ liệu mã hóa duy nhất từ URL (?data=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const encryptedData = urlParams.get('data');
+
+    const downloadBtn = document.getElementById('btn-drive');
+
+    if (encryptedData) {
+        try {
+            // 2. Tiến hành giải mã dữ liệu ngầm
+            const decryptedString = decodeAdvanced(encryptedData);
+            
+            // Tách chuỗi mảng ngược lại dựa trên ký tự |
+            const dataParts = decryptedString.split('|');
+            
+            const idCustomer = dataParts[2] || 'Khách Hàng';
+            const driveLink = dataParts[3];
+
+            // Đổi tiêu đề thư mục theo ID của khách hàng
+            document.getElementById('folder-title').innerText = "FOLDER: " + idCustomer;
+
+            if (driveLink && driveLink.startsWith('http')) {
+                downloadBtn.href = driveLink;
+            } else {
+                throw new Error("Link không hợp lệ");
+            }
+
+        } catch (e) {
+            // Trường hợp khách tự mò gõ sai cú pháp chuỗi mã hóa -> Báo lỗi bảo mật ngay lập tức
+            console.error("Lỗi xác thực: ", e);
+            document.getElementById('folder-title').innerText = "❌ LỖI TRUY CẬP";
+            downloadBtn.innerText = "Mã xác thực không đúng";
+            downloadBtn.style.background = "#ff3b30";
+            downloadBtn.style.pointerEvents = "none";
+        }
+    } else {
+        document.getElementById('folder-title').innerText = "❌ THIẾU THÔNG TIN";
+        downloadBtn.innerText = "Vui lòng quét lại mã QR chính chủ";
+        downloadBtn.style.background = "#8e8e93";
+        downloadBtn.style.pointerEvents = "none";
+    }
+</script>
+
+</body>
+</html>
