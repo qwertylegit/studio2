@@ -2,79 +2,118 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Album Khách Hàng - anhdulich.vn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Download - Studio</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { background: #f4f7f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; width: 90%; max-width: 400px; padding: 35px 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-        .icon-folder { font-size: 50px; margin-bottom: 10px; display: inline-block; }
-        h2 { color: #1d1d1f; margin: 0 0 8px 0; font-size: 22px; font-weight: 700; }
-        p { color: #86868b; font-size: 14px; margin: 0 0 30px 0; line-height: 1.4; }
-        .btn-download { display: block; padding: 16px 0; background: #007aff; color: white; text-decoration: none; border-radius: 14px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,122,255,0.25); transition: all 0.2s ease; }
-        .btn-download:hover { background: #0063cc; transform: translateY(-1px); }
+        body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f7f9; }
+        .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        .btn { display: block; padding: 18px; border-radius: 15px; font-weight: bold; text-decoration: none; margin-bottom: 20px; font-size: 17px; transition: 0.2s; }
+        .btn-drive { background: #1a73e8; color: white; box-shadow: 0 4px 15px rgba(26,115,232,0.3); }
+        .btn-drive:hover { background: #1557b0; }
+        p.note { font-size: 13px; color: #7f8c8d; line-height: 1.6; margin-top: 25px; text-align: left; background: #fff9db; padding: 12px; border-radius: 12px; border: 1px solid #ffe066; }
+
+        /* Giao diện quét QR từ camera giữ nguyên cấu trúc */
+        .scan-section { display: flex; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 20px; border: 1px dashed #cbd5e0; margin-bottom: 20px; }
+        .logo-qr { width: 50px; height: 50px; margin-right: 15px; opacity: 0.6; }
+        .scan-text { text-align: left; flex: 1; }
+        .scan-text b { font-size: 15px; color: #2c3e50; }
+        .scan-text p { margin: 3px 0 0; font-size: 12px; color: #7f8c8d; }
+        
+        .btn-open-cam { background: #007aff; color: white; border: none; padding: 12px 15px; border-radius: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin-top: 15px; display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div id="qrView" class="hidden">
+            <div class="scan-section">
+                <img src="https://cdn-icons-png.flaticon.com/512/241/241528.png" class="logo-qr">
+                <div class="scan-text">
+                    <b>Quét mã QR</b>
+                    <p>Để bắt đầu tải album</p>
+                </div>
+                <button class="btn-open-cam" id="btnStartScan">CAMERA</button>
+            </div>
+            <div id="reader"></div>
+        </div>
 
-<div class="card">
-    <span class="icon-folder">🛡️</span>
-    <h2 id="folder-title">MÃ KHÁCH HÀNG</h2>
-    <p>Trang tải ảnh & video chất lượng cao gốc.<br>Cảm ơn bạn đã lựa chọn anhdulich.vn!</p>
-    
-    <a href="#" id="btn-drive" class="btn-download" target="_blank">📥 XEM & TẢI ALBUM TRÊN DRIVE</a>
-</div>
-
-<script>
-    // Hàm xử lý giải mã chuỗi Web-Safe Base64 ngược lại thành Unicode text gốc
-    function decodeAdvanced(base64) {
-        let str = base64.replace(/-/g, '+').replace(/_/g, '/');
-        while (str.length % 4) { str += '='; }
-        return decodeURIComponent(atob(str).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-    }
-
-    // 1. Lấy dữ liệu mã hóa duy nhất từ URL (?data=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const encryptedData = urlParams.get('data');
-
-    const downloadBtn = document.getElementById('btn-drive');
-
-    if (encryptedData) {
-        try {
-            // 2. Tiến hành giải mã dữ liệu ngầm
-            const decryptedString = decodeAdvanced(encryptedData);
+        <div id="downloadView">
+            <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
+            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 25px;">Download Video/Photo</h2>
             
-            // Tách chuỗi mảng ngược lại dựa trên ký tự |
-            const dataParts = decryptedString.split('|');
+            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
             
-            const idCustomer = dataParts[2] || 'Khách Hàng';
-            const driveLink = dataParts[3];
+            <p class="note">
+                <b>Thông báo:</b> Album hình ảnh/video của bạn đã được tải lên máy chủ đám mây an toàn. Vui lòng bấm nút <b>Google Drive</b> ở trên để xem và tải về thiết bị.
+            </p>
+        </div>
 
-            // Đổi tiêu đề thư mục theo ID của khách hàng
-            document.getElementById('folder-title').innerText = "FOLDER: " + idCustomer;
+        <div style="font-size:12px; color:#bdc3c7; margin-top: 15px;">by @Sanviet</div>
+    </div>
 
-            if (driveLink && driveLink.startsWith('http')) {
-                downloadBtn.href = driveLink;
-            } else {
-                throw new Error("Link không hợp lệ");
-            }
-
-        } catch (e) {
-            // Trường hợp khách tự mò gõ sai cú pháp chuỗi mã hóa -> Báo lỗi bảo mật ngay lập tức
-            console.error("Lỗi xác thực: ", e);
-            document.getElementById('folder-title').innerText = "❌ LỖI TRUY CẬP";
-            downloadBtn.innerText = "Mã xác thực không đúng";
-            downloadBtn.style.background = "#ff3b30";
-            downloadBtn.style.pointerEvents = "none";
+    <script>
+        // Hàm giải mã WebSafe Base64 của Google sang văn bản thường
+        function decodeAdvanced(base64) {
+            let str = base64.replace(/-/g, '+').replace(/_/g, '/');
+            while (str.length % 4) { str += '='; }
+            return decodeURIComponent(escape(window.atob(str)));
         }
-    } else {
-        document.getElementById('folder-title').innerText = "❌ THIẾU THÔNG TIN";
-        downloadBtn.innerText = "Vui lòng quét lại mã QR chính chủ";
-        downloadBtn.style.background = "#8e8e93";
-        downloadBtn.style.pointerEvents = "none";
-    }
-</script>
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const encryptedData = urlParams.get('data');
+
+        const qrView = document.getElementById('qrView');
+        const downloadView = document.getElementById('downloadView');
+        const driveLink = document.getElementById('driveLink');
+        const albumTitle = document.getElementById('albumTitle');
+
+        if (!encryptedData) {
+            // Trường hợp 1: Khách tự gõ link web trực tiếp -> Hiện Camera bắt quét mã QR
+            qrView.classList.remove('hidden');
+            downloadView.classList.add('hidden');
+        } else {
+            // Trường hợp 2: Quét trúng QR Online có chứa gói dữ liệu mã hóa
+            qrView.classList.add('hidden');
+            downloadView.classList.remove('hidden');
+
+            try {
+                // Giải mã chuỗi dữ liệu dạng: Month|Day|Customer|DriveLink
+                const decryptedString = decodeAdvanced(encryptedData);
+                const parts = decryptedString.split('|');
+
+                if (parts.length >= 4) {
+                    const customerName = parts[2];
+                    const googleDriveUrl = parts[3];
+
+                    // Cập nhật tên Album hiển thị cho cá nhân hóa và nút bấm Drive
+                    albumTitle.innerText = `Album: ${customerName}`;
+                    driveLink.href = googleDriveUrl;
+                } else {
+                    alert("Cấu trúc dữ liệu mã QR không chính xác.");
+                }
+            } catch (error) {
+                alert("Không thể giải mã dữ liệu QR: " + error.message);
+            }
+        }
+
+        // --- Bộ xử lý quét mã bằng Camera trên điện thoại ---
+        const html5QrCode = new Html5Qrcode("reader");
+        document.getElementById('btnStartScan').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('reader').style.display = 'block';
+            
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    // Quét trúng mã nào lập tức chuyển hướng trang tới link đó luôn
+                    window.location.href = decodedText;
+                },
+                () => {}
+            ).catch(err => alert("Lỗi khởi tạo camera: " + err));
+        };
+    </script>
 </body>
 </html>
