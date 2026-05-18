@@ -37,7 +37,7 @@
             cursor: not-allowed;
         }
 
-        /* Màu đỏ nổi bật cho mã không tồn tại */
+        /* Màu đỏ nổi bật cho mã không tồn tại / đã bị xóa hẳn */
         .btn-danger {
             background: #e53e3e !important;
             color: #fff !important;
@@ -46,7 +46,7 @@
             cursor: not-allowed;
         }
 
-        /* Màu kích hoạt cho nút bấm chủ động kiểm tra lại khi hết 1 phút phạt */
+        /* Màu xanh lục hiển thị chủ động sau khi hết thời gian phạt ẩn */
         .btn-recheck {
             background: #2cb67d !important;
             color: #fff !important;
@@ -147,7 +147,7 @@
         
         // Trạng thái: 'checking', 'ready', 'empty', 'not_found', 'need_recheck'
         let buttonState = "checking"; 
-        const COOLDOWN_TIME = 60; // 🌟 TĂNG THỜI GIAN PHẠT LÊN 1 PHÚT (60 GIÂY)
+        const COOLDOWN_TIME = 60; // Thời gian phạt ẩn 1 phút
         let countdownTimer = null;
         let secondsLeft = 0;
 
@@ -198,7 +198,7 @@
                 btnCooldown: "请等待 {sec} 秒后重新检查...",
                 btnNeedRecheck: "点击重新 check 数据",
                 content: `<b>下载前必读:</b><br>数据同步 to 云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
-                instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看และ下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", 
@@ -220,7 +220,8 @@
                 secondsLeft--;
                 if (secondsLeft <= 0) {
                     clearInterval(countdownTimer);
-                    buttonState = "need_recheck"; // Hết 1 phút đổi sang nút Cho phép Check lại chủ động
+                    // 🌟 Đủ thời gian phạt ẩn -> Mới đổi trạng thái lộ diện nút Re-check
+                    buttonState = "need_recheck"; 
                 }
                 renderButtonUI();
             }, 1000);
@@ -249,7 +250,8 @@
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
             } else if (secondsLeft > 0) {
-                driveLink.innerText = data.btnCooldown.replace("{sec}", secondsLeft);
+                // 🌟 Đếm giây ẩn: hiển thị nội dung "Đang xử lý upload" thay vì hiện số giây chạy lùi trực tiếp
+                driveLink.innerText = data.btnEmpty; 
                 driveLink.classList.add('btn-processing');
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
@@ -271,7 +273,7 @@
             }
         }
 
-        // HÀM GỌI API THỜI GIAN THỰC
+        // LUỒNG KIỂM TRA CHÍNH CHẶT CHẼ
         function triggerCheckStatusAPI() {
             buttonState = "checking";
             renderButtonUI();
@@ -280,11 +282,12 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
-                        buttonState = "ready"; // 🌟 ĐÃ CÓ FILE: Chuyển sang nút Download và GIỮ YÊN TRẠNG THÁI (không check lại nữa)
+                        buttonState = "ready"; // Có file -> Nút xanh download và GIỮ YÊN TRẠNG THÁI hoàn toàn
                         const storageKey = "cooldown_" + currentFolderId;
                         localStorage.removeItem(storageKey); 
                     } else {
-                        buttonState = "empty"; // THƯ MỤC TRỐNG: Kích hoạt đếm ngược phạt 1 phút chống spam
+                        // Thư mục TỒN TẠI nhưng TRỐNG -> Lúc này mới kích hoạt đếm giây ẩn 1 phút
+                        buttonState = "empty"; 
                         const storageKey = "cooldown_" + currentFolderId;
                         const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
                         localStorage.setItem(storageKey, activeUntil.toString());
@@ -293,8 +296,9 @@
                     renderButtonUI();
                 })
                 .catch(err => {
-                    // 🌟 LỖI KẾT NỐI/XÓA MẤT THƯ MỤC: Chuyển sang nút Đỏ và GIỮ YÊN TRẠNG THÁI (đứng im chờ khách F5)
-                    console.error("API Error: ", err);
+                    // 🌟 BƯỚC 1 - ƯU TIÊN CAO NHẤT: Thư mục không tồn tại / Bị xóa / Link lỗi
+                    // Chuyển ngay sang nút Đỏ báo lỗi và GIỮ YÊN TRẠNG THÁI luôn (Không đếm giây, đứng im chờ F5)
+                    console.error("API Error: Thư mục không tồn tại hoặc đã bị xóa.", err);
                     buttonState = "not_found"; 
                     renderButtonUI();
                 });
@@ -331,7 +335,7 @@
             return decodeURIComponent(escape(window.atob(str)));
         }
 
-        // LUỒNG KIỂM TRA CHẠY 1 LẦN DUY NHẤT KHI NẠP TRANG (CHO ĐẾN KHI KHÁCH ẤN F5)
+        // KHỞI CHẠY KHI NẠP TRANG
         const urlParams = new URLSearchParams(window.location.search);
         const encryptedData = urlParams.get('data');
         const qrView = document.getElementById('qrView');
@@ -377,12 +381,12 @@
                         const now = Date.now();
 
                         if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
+                            // Nếu đang trong thời gian phạt ẩn cũ (chưa đủ 1 phút), tiếp tục chạy nốt số giây còn lại
                             buttonState = "empty";
                             const remainingSeconds = Math.ceil((parseInt(savedCooldownTimestamp) - now) / 1000);
                             switchLang(currentLang);
-                            startCooldownVisual(remainingSeconds); // Nếu đang trong thời gian phạt, tiếp tục đếm nốt số giây
+                            startCooldownVisual(remainingSeconds);
                         } else {
-                            // Gọi kiểm tra thời gian thực duy nhất khi nạp trang
                             triggerCheckStatusAPI();
                             switchLang(currentLang);
                         }
