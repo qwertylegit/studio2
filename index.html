@@ -8,7 +8,21 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f7f9; }
         .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        .btn { display: block; padding: 18px; border-radius: 15px; font-weight: bold; text-decoration: none; margin-bottom: 20px; font-size: 17px; transition: 0.2s; }
+        
+        /* Chống nút download bị kéo dài hết cỡ trên PC */
+        .btn { 
+            display: inline-block; 
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 320px; 
+            padding: 18px; 
+            border-radius: 15px; 
+            font-weight: bold; 
+            text-decoration: none; 
+            margin: 0 auto 20px auto; 
+            font-size: 17px; 
+            transition: 0.2s; 
+        }
         .btn-drive { background: #1a73e8; color: white; box-shadow: 0 4px 15px rgba(26,115,232,0.3); }
         .btn-drive:hover { background: #1557b0; }
         
@@ -38,6 +52,7 @@
 </head>
 <body>
     <div class="container">
+        
         <div id="qrView" class="hidden">
             <div class="scan-section">
                 <img src="https://cdn-icons-png.flaticon.com/512/241/241528.png" class="logo-qr">
@@ -49,32 +64,30 @@
             </div>
             <div id="reader"></div>
         </div>
+
         <div id="downloadView">
             <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
             
             <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Download Video/Photo</h2>
             <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 25px;"></h4>
             
+            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
             
-    </div>
-<p class="note">
-                <b>Read first:</b> 
-                <br>
-                Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>
+            <p class="note">
+                <b>Read first:</b><br>
+                Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>
                 
                 If the file is still missing after 1 hour, please contact our hotline for assistance.<br>
-                🔹 <b>Hotline:</b> 0987 767 717<br>
+                🔹 <b>Hotline:</b> 0987 767 717<br><br>
                 
-                ⚠️ <i>This QR code is valid for 1 month.</i></br>
-    Please click the button <b>Google Drive</b> above to view and download to your device.<br>
+                ⚠️ <i>This QR code is valid for 1 month.</i><br><br>
+                Please click the button <b>Google Drive</b> above to view and download to your device.
             </p>  
-        </div><div id="downloadView">
-        <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
-            
-            
+        </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 15px;">by @Sanviet</div>
-        </div>div>
+    </div>
+
     <script>
         // Hàm giải mã WebSafe Base64 của Google sang văn bản thường
         function decodeAdvanced(base64) {
@@ -90,14 +103,14 @@
         const downloadView = document.getElementById('downloadView');
         const driveLink = document.getElementById('driveLink');
         const albumTitle = document.getElementById('albumTitle');
-        const albumDate = document.getElementById('albumDate'); // Định danh dòng ngày tháng
+        const albumDate = document.getElementById('albumDate');
 
         if (!encryptedData) {
-            // Trường hợp 1: Khách tự gõ link web trực tiếp -> Hiện Camera bắt quét mã QR
+            // Khách tự vào trang chủ -> Hiện phần quét mã QR, ẩn sạch sẽ phần download
             qrView.classList.remove('hidden');
             downloadView.classList.add('hidden');
         } else {
-            // Trường hợp 2: Quét trúng QR Online có chứa gói dữ liệu mã hóa
+            // Có dữ liệu mã hóa -> Ẩn phần camera quét mã, mở phần download album
             qrView.classList.add('hidden');
             downloadView.classList.remove('hidden');
 
@@ -112,13 +125,13 @@
                     const customerName = parts[2];   // Ví dụ: "ID_KHACH"
                     const googleDriveUrl = parts[3]; // Link Drive
 
-                    // Xử lý làm sạch chuỗi loại bỏ chữ "Thang_" và "Ngay_" để lấy số nguyên bản
+                    // Trích xuất số nguyên bản
                     const cleanDay = dayRaw.replace(/[^0-9]/g, '');
                     const cleanMonth = monthRaw.replace(/[^0-9]/g, '');
 
-                    // Cập nhật thông tin lên giao diện
+                    // Gán nội dung hiển thị chuẩn lên giao diện
                     albumTitle.innerText = `Album: ${customerName}`;
-                    albumDate.innerText = `Date: ${cleanDay}`; // Định dạng chuẩn Date: DD/MM /${cleanMonth}
+                    albumDate.innerText = `Date: ${cleanDay}/${cleanMonth}`; // Định dạng trả về: 18/05
                     driveLink.href = googleDriveUrl;
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
@@ -138,7 +151,6 @@
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
-                    // Quét xong lập tức chuyển hướng trang tới link chứa mã dữ liệu mới
                     window.location.href = decodedText;
                 },
                 () => {}
