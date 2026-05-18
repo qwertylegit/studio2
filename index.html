@@ -19,13 +19,14 @@
             border-radius: 15px; 
             font-weight: bold; 
             text-decoration: none; 
-            margin: 20px auto 0 auto; /* Đổi margin để tạo khoảng cách đẹp với khối text phía trên */
+            margin: 20px auto 0 auto; 
             font-size: 17px; 
             transition: 0.2s; 
         }
         .btn-drive { background: #1a73e8; color: white; box-shadow: 0 4px 15px rgba(26,115,232,0.3); }
         .btn-drive:hover { background: #1557b0; }
         
+        /* Khung thông báo Note màu vàng */
         p.note { 
             font-size: 13.5px; 
             color: #4a5568; 
@@ -36,6 +37,30 @@
             padding: 18px; 
             border-radius: 16px; 
             border: 1px solid #ffe066; 
+            position: relative; 
+        }
+
+        /* Thanh chứa các nút cờ ngôn ngữ nằm góc trên bên phải */
+        .lang-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+        }
+        .lang-btn {
+            background: #fff;
+            border: 1px solid #cbd5e0;
+            padding: 2px 5px;
+            font-size: 16px; /* Tăng size để biểu tượng lá cờ hiển thị rõ ràng */
+            line-height: 1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .lang-btn.active {
+            background: #ffe066;
+            border-color: #f59e0b;
         }
 
         /* Giao diện quét QR từ camera */
@@ -68,28 +93,91 @@
         <div id="downloadView">
             <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
             
-            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Download Video/Photo</h2>
-            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 10px;"></h4>
+            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Mã số khách: ---</h2>
+            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 10px;">Ngày chụp: --/--</h4>
             
             <p class="note">
-                <b>Read first:</b><br>
-                Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>
-                
-                If the file is still missing after 1 hour, please contact our hotline for assistance.<br>
-                🔹 <b>Hotline:</b> 0987 767 717<br>
-                
-                ⚠️ <i>This QR code is valid for 1 month.</i><br>
-                Please click the button <b>Google Drive</b> below to view and download to your device.
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="switchLang('vi')">🇻🇳</button>
+                    <button class="lang-btn" onclick="switchLang('en')">🇬🇧</button>
+                    <button class="lang-btn" onclick="switchLang('ru')">🇷🇺</button>
+                    <button class="lang-btn" onclick="switchLang('zh')">🇨🇳</button>
+                    <button class="lang-btn" onclick="switchLang('ko')">🇰🇷</button>
+                </div>
+
+                <span id="noteContent">
+                    <b>Đọc trước khi tải:</b><br>
+                    Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br><br>
+                    
+                    Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>
+                    🔹 <b>Hotline:</b> 0987 767 717<br><br>
+                    
+                    ⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br><br>
+                    Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.
+                </span>
             </p>  
 
-            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
+            <a id="driveLink" href="#" class="btn btn-drive">TẢI VỀ BẰNG GOOGLE DRIVE</a>
         </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div>
     </div>
 
     <script>
-        // Hàm giải mã WebSafe Base64 của Google sang văn bản thường
+        // Khai báo biến lưu trữ dữ liệu giải mã toàn cục
+        let globalCustomerName = "";
+        let globalDay = "";
+        let globalMonth = "";
+        let currentLang = "vi"; // Ngôn ngữ mặc định ban đầu là Tiếng Việt
+
+        // Kho lưu trữ từ điển đa ngôn ngữ (VI - EN - RU - ZH - KO)
+        const dictionary = {
+            vi: {
+                title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE",
+                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br><br>Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>🔹 <b>Hotline:</b> 0987 767 717<br><br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br><br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
+            },
+            en: {
+                title: "Code number", date: "Date", btn: "DOWNLOAD WITH GOOGLE DRIVE",
+                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>If the file is still missing after 1 hour, please contact our hotline for assistance.<br>🔹 <b>Hotline:</b> 0987 767 717<br><br>⚠️ <i>This QR code is valid for 1 month.</i><br><br>Please click the button <b>Google Drive</b> below to view and download to your device.`
+            },
+            ru: {
+                title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE",
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br><br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br><br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
+            },
+            zh: {
+                title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载",
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求 backend 协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+            },
+            ko: {
+                title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드",
+                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br><br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br><br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
+            }
+        };
+
+        // Hàm chuyển đổi ngôn ngữ nhanh bằng Javascript thuần
+        function switchLang(lang) {
+            currentLang = lang;
+            
+            // Xử lý bật/tắt class hiệu ứng active cho các nút cờ
+            const buttons = document.querySelectorAll('.lang-btn');
+            buttons.forEach(btn => {
+                // Kiểm tra thuộc tính onclick để nhận biết nút chính xác
+                if(btn.getAttribute('onclick').includes(`'${lang}'`)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Gán dữ liệu tương ứng trong từ điển lên giao diện
+            const data = dictionary[lang];
+            document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
+            document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}/${globalMonth}`;
+            document.getElementById('driveLink').innerText = data.btn;
+            document.getElementById('noteContent').innerHTML = data.content;
+        }
+
+        // Hàm giải mã WebSafe Base64 của Google
         function decodeAdvanced(base64) {
             let str = base64.replace(/-/g, '+').replace(/_/g, '/');
             while (str.length % 4) { str += '='; }
@@ -102,8 +190,6 @@
         const qrView = document.getElementById('qrView');
         const downloadView = document.getElementById('downloadView');
         const driveLink = document.getElementById('driveLink');
-        const albumTitle = document.getElementById('albumTitle');
-        const albumDate = document.getElementById('albumDate');
 
         if (!encryptedData) {
             qrView.classList.remove('hidden');
@@ -113,24 +199,23 @@
             downloadView.classList.remove('hidden');
 
             try {
-                // Giải mã chuỗi dữ liệu dạng: Month|Day|Customer|DriveLink
                 const decryptedString = decodeAdvanced(encryptedData);
                 const parts = decryptedString.split('|');
 
                 if (parts.length >= 4) {
                     const monthRaw = parts[0];       
                     const dayRaw = parts[1];         
-                    const customerName = parts[2];   
+                    globalCustomerName = parts[2];   
                     const googleDriveUrl = parts[3]; 
 
                     // Trích xuất số nguyên bản
-                    const cleanDay = dayRaw.replace(/[^0-9]/g, '');
-                    const cleanMonth = monthRaw.replace(/[^0-9]/g, '');
+                    globalDay = dayRaw.replace(/[^0-9]/g, '');
+                    globalMonth = monthRaw.replace(/[^0-9]/g, '');
 
-                    // Gán nội dung hiển thị chuẩn lên giao diện
-                    albumTitle.innerText = `Code number: ${customerName}`;
-                    albumDate.innerText = `Date: ${cleanDay}/${cleanMonth}`; 
                     driveLink.href = googleDriveUrl;
+                    
+                    // Thực thi hiển thị ngôn ngữ mặc định sau khi bóc tách xong dữ liệu (Ban đầu là VI)
+                    switchLang(currentLang);
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
                 }
