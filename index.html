@@ -23,7 +23,13 @@
             font-size: 17px; 
             transition: 0.2s; 
         }
-        .btn-drive { background: #1a73e8; color: white; box-shadow: 0 4px 15px rgba(26,115,232,0.3); }
+        /* Mặc định ẩn nút Drive đi, chỉ hiện khi QR hợp lệ */
+        .btn-drive { 
+            background: #1a73e8; 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(26,115,232,0.3); 
+            display: none; 
+        }
         .btn-drive:hover { background: #1557b0; }
         
         /* Khung thông báo Note màu vàng */
@@ -148,15 +154,15 @@
             },
             ru: {
                 title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 minutes. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i><br>请点击下方的 <b>Google Drive</b> 2按钮在您的设备上查看和下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드",
-                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
+                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움 v을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
@@ -204,7 +210,7 @@
                 const parts = decryptedString.split('|');
 
                 if (parts.length >= 4) {
-                    const dayRaw = parts[1]; // Ví dụ: "Ngay_0902z" hoặc "0902n"       
+                    const dayRaw = parts[1];        
                     globalCustomerName = parts[2];   
                     const googleDriveUrl = parts[3]; 
 
@@ -212,7 +218,7 @@
                     const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
                     let finalDayStr = digitsOnly.substring(0, 4); 
 
-                    // 2. Chuyển đổi chuỗi chữ thô ban đầu thành chữ thường để so sánh hậu tố phân khu dịch vụ
+                    // 2. Phân loại hậu tố dịch vụ bổ sung
                     const lowerDayRaw = dayRaw.toLowerCase();
                     if (lowerDayRaw.includes('z')) {
                         finalDayStr += " / Zipline";
@@ -223,14 +229,25 @@
                     }
 
                     globalDay = finalDayStr;
-                    driveLink.href = googleDriveUrl;
+
+                    // 🔒 LOGIC BẢO MẬT: Kiểm tra tính hợp lệ của link Drive
+                    // Nếu link rỗng hoặc trỏ về trang chủ công khai (không phải folder Drive thật)
+                    if (!googleDriveUrl || googleDriveUrl.includes("anhdulich.vn") || googleDriveUrl === "") {
+                        driveLink.style.display = "none"; // ẨN HOÀN TOÀN NÚT DOWNLOAD
+                        alert("Thư mục ảnh chưa sẵn sàng hoặc mã QR không hợp lệ.");
+                    } else {
+                        driveLink.href = googleDriveUrl;
+                        driveLink.style.display = "inline-block"; // CHỈ HIỆN KHI ĐÚNG LINK DRIVE KHÁCH
+                    }
                     
                     detectDeviceLanguage();
                     switchLang(currentLang);
                 } else {
+                    driveLink.style.display = "none";
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
                 }
             } catch (error) {
+                driveLink.style.display = "none";
                 alert("Không thể giải mã dữ liệu QR: " + error.message);
             }
         }
