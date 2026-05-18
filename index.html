@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,36 +31,35 @@
             font-size: 13.5px; 
             color: #4a5568; 
             line-height: 1.6; 
-            margin-top: 25px; 
+            margin-top: 20px; 
             text-align: left; 
             background: #fff9db; 
             padding: 18px; 
             border-radius: 16px; 
             border: 1px solid #ffe066; 
-            position: relative; 
         }
 
-        /* Thanh chứa các nút cờ ngôn ngữ nằm góc trên bên phải */
+        /* Thanh chứa các nút cờ ngôn ngữ nằm riêng biệt ngoài khung vàng */
         .lang-switcher {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             display: flex;
-            gap: 4px;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0 5px 0;
         }
         .lang-btn {
             background: #fff;
             border: 1px solid #cbd5e0;
-            padding: 2px 5px;
-            font-size: 16px; 
+            padding: 4px 8px;
+            font-size: 18px; /* Tăng nhẹ kích thước cờ cho dễ bấm */
             line-height: 1;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .lang-btn.active {
-            background: #ffe066;
-            border-color: #f59e0b;
+            background: #e2e8f0;
+            border-color: #4a5568;
         }
 
         /* Giao diện quét QR từ camera */
@@ -93,31 +92,31 @@
         <div id="downloadView">
             <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
             
-            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Mã số khách: ---</h2>
-            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 10px;">Ngày chụp: --/--</h4>
+            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Code number: ---</h2>
+            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 0;">Date: ----</h4>
             
-            <p class="note">
-                <span class="lang-switcher">
-                    <button class="lang-btn active" onclick="switchLang('vi')">🇻🇳</button>
-                    <button class="lang-btn" onclick="switchLang('en')">🇬🇧</button>
-                    <button class="lang-btn" onclick="switchLang('ru')">🇷🇺</button>
-                    <button class="lang-btn" onclick="switchLang('zh')">🇨🇳</button>
-                    <button class="lang-btn" onclick="switchLang('ko')">🇰🇷</button>
-                </span>
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="switchLang('vi')">🇻🇳</button>
+                <button class="lang-btn" onclick="switchLang('en')">🇬🇧</button>
+                <button class="lang-btn" onclick="switchLang('ru')">🇷🇺</button>
+                <button class="lang-btn" onclick="switchLang('zh')">🇨🇳</button>
+                <button class="lang-btn" onclick="switchLang('ko')">🇰🇷</button>
+            </div>
 
+            <p class="note">
                 <span id="noteContent">
-                    <b>Đọc trước khi tải:</b><br>
-                    Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br><br>
+                    <b>Read first:</b><br>
+                    Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>
                     
-                    Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>
+                    If the file is still missing after 1 hour, please contact our hotline for assistance.<br>
                     🔹 <b>Hotline:</b> 0987 767 717<br><br>
                     
-                    ⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br><br>
-                    Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.
+                    ⚠️ <i>This QR code is valid for 1 month.</i><br><br>
+                    Please click the button <b>Google Drive</b> below to view and download to your device.
                 </span>
             </p>  
 
-            <a id="driveLink" href="#" class="btn btn-drive">TẢI VỀ BẰNG GOOGLE DRIVE</a>
+            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
         </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div>
@@ -125,10 +124,10 @@
 
     <script>
         let globalCustomerName = "";
-        let globalDay = "";
-        let globalMonth = "";
-        let currentLang = "vi"; 
+        let globalDay = ""; // Chỉ lưu chuỗi số nguyên bản (Ví dụ: 0902)
+        let currentLang = "en"; // Thay đổi mặc định của site thành tiếng Anh ('en')
 
+        // Kho lưu trữ từ điển đa ngôn ngữ (Đã cập nhật mặc định chuẩn hóa)
         const dictionary = {
             vi: {
                 title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE",
@@ -144,7 +143,7 @@
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看และ下载。`
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드",
@@ -166,7 +165,7 @@
 
             const data = dictionary[lang];
             document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
-            document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}/${globalMonth}`;
+            document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; // Chỉ xuất nội dung ngày sạch (VD: 0902)
             document.getElementById('driveLink').innerText = data.btn;
             document.getElementById('noteContent').innerHTML = data.content;
         }
@@ -196,15 +195,16 @@
                 const parts = decryptedString.split('|');
 
                 if (parts.length >= 4) {
-                    const monthRaw = parts[0];       
-                    const dayRaw = parts[1];         
+                    const dayRaw = parts[1]; // Chuỗi thô chứa ngày, ví dụ: "Ngay_0902"        
                     globalCustomerName = parts[2];   
                     const googleDriveUrl = parts[3]; 
 
+                    // CHỈ LẤY NỘI DUNG SỐ NGUYÊN BẢN (Ví dụ từ Ngay_0902 bóc ra thành 0902, bỏ qua phần tháng)
                     globalDay = dayRaw.replace(/[^0-9]/g, '');
-                    globalMonth = monthRaw.replace(/[^0-9]/g, '');
 
                     driveLink.href = googleDriveUrl;
+                    
+                    // Chạy dịch tự động (Mặc định hiển thị ngôn ngữ English)
                     switchLang(currentLang);
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
