@@ -145,9 +145,8 @@
         let globalDay = ""; 
         let currentLang = "en"; 
         
-        // Trạng thái: 'checking', 'ready', 'empty', 'not_found', 'need_recheck'
         let buttonState = "checking"; 
-        const COOLDOWN_TIME = 60; // Thời gian phạt ẩn 1 phút
+        const COOLDOWN_TIME = 60; 
         let countdownTimer = null;
         let secondsLeft = 0;
 
@@ -220,7 +219,6 @@
                 secondsLeft--;
                 if (secondsLeft <= 0) {
                     clearInterval(countdownTimer);
-                    // 🌟 Đủ thời gian phạt ẩn -> Mới đổi trạng thái lộ diện nút Re-check
                     buttonState = "need_recheck"; 
                 }
                 renderButtonUI();
@@ -250,7 +248,6 @@
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
             } else if (secondsLeft > 0) {
-                // 🌟 Đếm giây ẩn: hiển thị nội dung "Đang xử lý upload" thay vì hiện số giây chạy lùi trực tiếp
                 driveLink.innerText = data.btnEmpty; 
                 driveLink.classList.add('btn-processing');
                 actionInst.innerHTML = "";
@@ -273,32 +270,40 @@
             }
         }
 
-        // LUỒNG KIỂM TRA CHÍNH CHẶT CHẼ
         function triggerCheckStatusAPI() {
             buttonState = "checking";
             renderButtonUI();
 
             fetch(`${currentAppsScriptUrl}?action=check_status&folder_id=${currentFolderId}&token=${currentSecretToken}`)
-                .then(response => response.json())
+                .then(response => {
+                    // Nếu phản hồi lỗi HTTP hoặc không đọc được JSON chuẩn, ném lỗi ra khối catch luôn
+                    if (!response.ok) throw new Error("HTTP error");
+                    return response.json();
+                })
                 .then(data => {
-                    if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
-                        buttonState = "ready"; // Có file -> Nút xanh download và GIỮ YÊN TRẠNG THÁI hoàn toàn
-                        const storageKey = "cooldown_" + currentFolderId;
-                        localStorage.removeItem(storageKey); 
+                    // 🌟 SỬA LỖI TẠI ĐÂY: Phải kiểm tra chắc chắn có thuộc tính data và data.status hợp lệ từ Apps Script trả về
+                    if (data && data.status === "success") {
+                        if (data.hasFiles === true || data.hasFiles === "true") {
+                            buttonState = "ready"; 
+                            const storageKey = "cooldown_" + currentFolderId;
+                            localStorage.removeItem(storageKey); 
+                        } else {
+                            // CHỈ KHI THƯ MỤC THỰC SỰ TỒN TẠI VÀ TRỐNG MỚI ĐẾM GIÂY ẨN
+                            buttonState = "empty"; 
+                            const storageKey = "cooldown_" + currentFolderId;
+                            const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
+                            localStorage.setItem(storageKey, activeUntil.toString());
+                            startCooldownVisual(COOLDOWN_TIME);
+                        }
                     } else {
-                        // Thư mục TỒN TẠI nhưng TRỐNG -> Lúc này mới kích hoạt đếm giây ẩn 1 phút
-                        buttonState = "empty"; 
-                        const storageKey = "cooldown_" + currentFolderId;
-                        const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
-                        localStorage.setItem(storageKey, activeUntil.toString());
-                        startCooldownVisual(COOLDOWN_TIME);
+                        // Nếu data trống hoặc status báo lỗi từ bên trong Google Drive -> Coi như Mã không tồn tại
+                        buttonState = "not_found";
                     }
                     renderButtonUI();
                 })
                 .catch(err => {
-                    // 🌟 BƯỚC 1 - ƯU TIÊN CAO NHẤT: Thư mục không tồn tại / Bị xóa / Link lỗi
-                    // Chuyển ngay sang nút Đỏ báo lỗi và GIỮ YÊN TRẠNG THÁI luôn (Không đếm giây, đứng im chờ F5)
-                    console.error("API Error: Thư mục không tồn tại hoặc đã bị xóa.", err);
+                    // Khi Apps Script bị sập nguồn (do hàm getFolderById lỗi thư mục bị xóa), lập tức nhảy vào đây
+                    console.error("Lỗi kết nối hoặc Thư mục không tồn tại.", err);
                     buttonState = "not_found"; 
                     renderButtonUI();
                 });
@@ -335,7 +340,6 @@
             return decodeURIComponent(escape(window.atob(str)));
         }
 
-        // KHỞI CHẠY KHI NẠP TRANG
         const urlParams = new URLSearchParams(window.location.search);
         const encryptedData = urlParams.get('data');
         const qrView = document.getElementById('qrView');
@@ -381,7 +385,6 @@
                         const now = Date.now();
 
                         if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
-                            // Nếu đang trong thời gian phạt ẩn cũ (chưa đủ 1 phút), tiếp tục chạy nốt số giây còn lại
                             buttonState = "empty";
                             const remainingSeconds = Math.ceil((parseInt(savedCooldownTimestamp) - now) / 1000);
                             switchLang(currentLang);
