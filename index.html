@@ -19,7 +19,7 @@
             border-radius: 15px; 
             font-weight: bold; 
             text-decoration: none; 
-            margin: 0 auto 20px auto; 
+            margin: 20px auto 0 auto; /* Đổi margin để tạo khoảng cách đẹp với khối text phía trên */
             font-size: 17px; 
             transition: 0.2s; 
         }
@@ -69,9 +69,7 @@
             <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
             
             <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Download Video/Photo</h2>
-            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 25px;"></h4>
-            
-            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
+            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 10px;"></h4>
             
             <p class="note">
                 <b>Read first:</b><br>
@@ -81,11 +79,13 @@
                 🔹 <b>Hotline:</b> 0987 767 717<br><br>
                 
                 ⚠️ <i>This QR code is valid for 1 month.</i><br><br>
-                Please click the button <b>Google Drive</b> above to view and download to your device.
+                Please click the button <b>Google Drive</b> below to view and download to your device.
             </p>  
+
+            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
         </div>
 
-        <div style="font-size:12px; color:#bdc3c7; margin-top: 15px;">by @Sanviet</div>
+        <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div>
     </div>
 
     <script>
@@ -106,11 +106,9 @@
         const albumDate = document.getElementById('albumDate');
 
         if (!encryptedData) {
-            // Khách tự vào trang chủ -> Hiện phần quét mã QR, ẩn sạch sẽ phần download
             qrView.classList.remove('hidden');
             downloadView.classList.add('hidden');
         } else {
-            // Có dữ liệu mã hóa -> Ẩn phần camera quét mã, mở phần download album
             qrView.classList.add('hidden');
             downloadView.classList.remove('hidden');
 
@@ -120,10 +118,10 @@
                 const parts = decryptedString.split('|');
 
                 if (parts.length >= 4) {
-                    const monthRaw = parts[0];       // Ví dụ: "Thang_05"
-                    const dayRaw = parts[1];         // Ví dụ: "Ngay_18"
-                    const customerName = parts[2];   // Ví dụ: "ID_KHACH"
-                    const googleDriveUrl = parts[3]; // Link Drive
+                    const monthRaw = parts[0];       
+                    const dayRaw = parts[1];         
+                    const customerName = parts[2];   
+                    const googleDriveUrl = parts[3]; 
 
                     // Trích xuất số nguyên bản
                     const cleanDay = dayRaw.replace(/[^0-9]/g, '');
@@ -131,7 +129,7 @@
 
                     // Gán nội dung hiển thị chuẩn lên giao diện
                     albumTitle.innerText = `Album: ${customerName}`;
-                    albumDate.innerText = `Date: ${cleanDay}/${cleanMonth}`; // Định dạng trả về: 18/05
+                    albumDate.innerText = `Date: ${cleanDay}/${cleanMonth}`; 
                     driveLink.href = googleDriveUrl;
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
