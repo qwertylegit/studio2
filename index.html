@@ -117,6 +117,7 @@
             <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
             
             <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Code number: ---</h2>
+            <h4 id="albumBranch" style="color:#1a73e8; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-size: 15px;">Branch: ----</h4>
             <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 0;">Date: ----</h4>
             
             <div class="lang-switcher">
@@ -139,13 +140,22 @@
     </div>
 
     <script>
+        // 🌟 BẢNG THIẾT LẬP TÊN ĐẦY ĐỦ TẠI GITHUB (Địa danh gốc giữ nguyên không dịch)
+        const branchMap = {
+            "NT": "Vinwonders Nha Trang",
+            "DN": "Đà Nẵng",
+            "HL": "Hạ Long",
+            "PQ": "Phú Quốc"
+        };
+
         let globalCustomerName = "";
         let globalDay = ""; 
+        let globalBranch = ""; 
         let currentLang = "en"; 
         
         let buttonState = "checking"; 
-        const COOLDOWN_TIME = 60; // Thời gian phạt ẩn 1 phút khi trống/lỗi
-        const DOWNLOAD_EXPIRY_DAYS = 30; // Thời gian giữ nút xanh Download (30 ngày)
+        const COOLDOWN_TIME = 60; 
+        const DOWNLOAD_EXPIRY_DAYS = 30; 
         let countdownTimer = null;
         let secondsLeft = 0;
 
@@ -155,7 +165,7 @@
 
         const dictionary = {
             vi: {
-                title: "Mã số khách", date: "Ngày chụp", 
+                title: "Mã số khách", date: "Ngày chụp", branch: "Chi nhánh",
                 btnReady: "TẢI VỀ BẰNG GOOGLE DRIVE",
                 btnChecking: "ĐANG KIỂM TRA DỮ LIỆU...",
                 btnEmpty: "ĐANG XỬ LÝ UPLOAD... VUI LÒNG THỬ LẠI SAU.",
@@ -166,7 +176,7 @@
                 instruction: `<br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
             },
             en: {
-                title: "Code number", date: "Date", 
+                title: "Code number", date: "Date", branch: "Branch",
                 btnReady: "DOWNLOAD WITH GOOGLE DRIVE",
                 btnChecking: "CHECKING DATA...",
                 btnEmpty: "UPLOADING DATA... PLEASE TRY AGAIN LATER.",
@@ -177,29 +187,29 @@
                 instruction: `<br>Please click the button <b>Google Drive</b> below to view and download to your device.`
             },
             ru: {
-                title: "Номер кода", date: "Дата", 
+                title: "Номер кода", date: "Дата", branch: "Филиал",
                 btnReady: "СКАЧАТЬ С GOOGLE DRIVE",
-                btnChecking: "ПРОВЕРКА DАННЫХ...",
+                btnChecking: "ПРОВЕРКА ĐАННЫХ...",
                 btnEmpty: "ЗАГРУЗКА ДАННЫХ... ПОЖАЛУЙСТА, ПОПРОБУЙТЕ ПОЗЖЕ.",
                 btnNotFound: "QR-КОД НЕ СУЩЕСТВУЕТ ИЛИ ИСТЕК",
                 btnCooldown: "ПОЖАЛУЙСТА, ПОДОЖДИТЕ {sec}S...",
-                btnNeedRecheck: "НАЖМИТЕ ĐЛЯ ПОВТОРНОЙ ПОВЕРКИ",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 minutes. Nếu статус và trạng thái báo "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
+                btnNeedRecheck: "НАЖМИТЕ ДЛЯ ПОВТОРНОЙ ПОВЕРКИ",
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
                 instruction: `<br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и скачать на свое устройство.`
             },
             zh: {
-                title: "客户编号", date: "拍摄日期", 
+                title: "客户编号", date: "拍摄日期", branch: "分店",
                 btnReady: "通过 GOOGLE DRIVE 下载", 
                 btnChecking: "正在检查数据...",
                 btnEmpty: "数据正在上传中... 请稍后再试。",
                 btnNotFound: "二维码不存在或已过期",
                 btnCooldown: "请等待 {sec} 秒后重新检查...",
-                btnNeedRecheck: "点击重新 check 数据",
-                content: `<b>下载前必读:</b><br>数据同步 to 云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
-                instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看และ下载。`
+                btnNeedRecheck: "点击重新检查数据",
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
+                instruction: `<br>请点击下方の <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
             ko: {
-                title: "고객 번호", date: "촬영 날짜", 
+                title: "고객 번호", date: "촬영 날짜", branch: "지점",
                 btnReady: "GOOGLE DRIVE로 다운로드", 
                 btnChecking: "데이터 확인 중...",
                 btnEmpty: "데이터 업로드 중... 나중에 다시 시도해 주세요.",
@@ -207,7 +217,7 @@
                 btnCooldown: "재확인하려면 {sec}초간 기다려주세요...",
                 btnNeedRecheck: "데이터를 재확인하려면 클릭하세요",
                 content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 상태가 "데이터 업로드 중"으로 표시되면 나중에 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i>`,
-                instruction: `<br>기기에서 보고 다운로드하려면 아래 của <b>Google Drive</b> 버튼을 클릭하세요.`
+                instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
@@ -292,11 +302,8 @@
                     if (data && data.status === "success") {
                         if (data.hasFiles === true || data.hasFiles === "true") {
                             buttonState = "ready"; 
-                            
-                            // 🌟 LƯU CACHE READY CÓ THỜI HẠN 30 NGÀY
                             const readyUntil = Date.now() + (DOWNLOAD_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
                             localStorage.setItem(readyKey, readyUntil.toString());
-                            
                             localStorage.removeItem(storageKey); 
                             localStorage.removeItem(typeKey);
                         } else {
@@ -346,6 +353,7 @@
             
             const data = dictionary[lang];
             document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
+            document.getElementById('albumBranch').innerText = `${data.branch}: ${globalBranch}`; 
             document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; 
             document.getElementById('noteContent').innerHTML = data.content;
 
@@ -374,12 +382,17 @@
                 const decryptedString = decodeAdvanced(encryptedData);
                 const parts = decryptedString.split('|');
 
-                if (parts.length >= 6) {
+                if (parts.length >= 7) {
                     const dayRaw = parts[1];
                     globalCustomerName = parts[2];   
-                    currentFolderId = parts[3];       
-                    const scriptId = parts[4];       
-                    currentSecretToken = parts[5];
+                    
+                    // 🌟 BÓC MÃ VIẾT TẮT VÀ TRA BẢNG ĐỂ HIỂN THỊ TÊN ĐẦY ĐỦ
+                    const code = parts[3]; 
+                    globalBranch = branchMap[code] || code; // Dự phòng hiện luôn mã code nếu quên cấu hình map
+                    
+                    currentFolderId = parts[4];       
+                    const scriptId = parts[5];       
+                    currentSecretToken = parts[6];
                     
                     driveLink.href = "https://drive.google.com/drive/folders/" + currentFolderId;
                     currentAppsScriptUrl = "https://script.google.com/macros/s/" + scriptId + "/exec";
@@ -393,24 +406,21 @@
                     globalDay = finalDayStr;
 
                     detectDeviceLanguage();
+                    switchLang(currentLang); 
 
                     if (!currentFolderId || currentFolderId === "undefined") {
                         buttonState = "not_found"; 
                         switchLang(currentLang);
                     } else {
-                        // 🌟 ĐỌC KIỂM TRA HẠN SỬ DỤNG CỦA NÚT DOWNLOAD XANH (30 NGÀY)
                         const readyTimestamp = localStorage.getItem("ready_" + currentFolderId);
                         const now = Date.now();
                         
                         if (readyTimestamp && now < parseInt(readyTimestamp)) {
-                            // Nếu vẫn còn nằm trong hạn 30 ngày -> Hiện luôn nút download xanh, không gọi API
                             buttonState = "ready";
                             switchLang(currentLang);
                         } else {
-                            // Nếu đã quá 30 ngày (hoặc chưa từng sẵn sàng) -> Xóa hẳn bộ nhớ đệm Ready cũ
                             localStorage.removeItem("ready_" + currentFolderId);
 
-                            // Chuyển sang kiểm tra hình phạt 1 phút (Chống reload cho trống/lỗi)
                             const storageKey = "cooldown_" + currentFolderId;
                             const savedCooldownTimestamp = localStorage.getItem(storageKey);
 
