@@ -50,7 +50,7 @@
             background: #fff;
             border: 1px solid #cbd5e0;
             padding: 4px 8px;
-            font-size: 18px; /* Tăng nhẹ kích thước cờ cho dễ bấm */
+            font-size: 18px; 
             line-height: 1;
             border-radius: 8px;
             cursor: pointer;
@@ -106,12 +106,10 @@
             <p class="note">
                 <span id="noteContent">
                     <b>Read first:</b><br>
-                    Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>
-                    
+                    Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>
                     If the file is still missing after 1 hour, please contact our hotline for assistance.<br>
-                    🔹 <b>Hotline:</b> 0987 767 717<br><br>
-                    
-                    ⚠️ <i>This QR code is valid for 1 month.</i><br><br>
+                    🔹 <b>Hotline:</b> 0987 767 717<br>
+                    ⚠️ <i>This QR code is valid for 1 month.</i><br>
                     Please click the button <b>Google Drive</b> below to view and download to your device.
                 </span>
             </p>  
@@ -124,30 +122,41 @@
 
     <script>
         let globalCustomerName = "";
-        let globalDay = ""; // Chỉ lưu chuỗi số nguyên bản (Ví dụ: 0902)
-        let currentLang = "en"; // Thay đổi mặc định của site thành tiếng Anh ('en')
+        let globalDay = ""; 
+        let currentLang = "en"; 
 
-        // Kho lưu trữ từ điển đa ngôn ngữ (Đã cập nhật mặc định chuẩn hóa)
+        // Hàm tự động phát hiện ngôn ngữ hệ thống của điện thoại
+        function detectDeviceLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            const shortLang = browserLang.toLowerCase().split('-')[0]; 
+            
+            if (['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang)) {
+                currentLang = shortLang;
+            } else {
+                currentLang = 'en'; 
+            }
+        }
+
         const dictionary = {
             vi: {
                 title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE",
-                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br><br>Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>🔹 <b>Hotline:</b> 0987 767 717<br><br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br><br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
+                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br>Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
             },
             en: {
                 title: "Code number", date: "Date", btn: "DOWNLOAD WITH GOOGLE DRIVE",
-                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>If the file is still missing after 1 hour, please contact our hotline for assistance.<br>🔹 <b>Hotline:</b> 0987 767 717<br><br>⚠️ <i>This QR code is valid for 1 month.</i><br><br>Please click the button <b>Google Drive</b> below to view and download to your device.`
+                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>If the file is still missing after 1 hour, please contact our hotline for assistance.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i><br>Please click the button <b>Google Drive</b> below to view and download to your device.`
             },
             ru: {
                 title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br><br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br><br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드",
-                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br><br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br><br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
+                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
@@ -165,7 +174,7 @@
 
             const data = dictionary[lang];
             document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
-            document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; // Chỉ xuất nội dung ngày sạch (VD: 0902)
+            document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; 
             document.getElementById('driveLink').innerText = data.btn;
             document.getElementById('noteContent').innerHTML = data.content;
         }
@@ -195,16 +204,28 @@
                 const parts = decryptedString.split('|');
 
                 if (parts.length >= 4) {
-                    const dayRaw = parts[1]; // Chuỗi thô chứa ngày, ví dụ: "Ngay_0902"        
+                    const dayRaw = parts[1]; // Ví dụ: "Ngay_0902z" hoặc "0902n"       
                     globalCustomerName = parts[2];   
                     const googleDriveUrl = parts[3]; 
 
-                    // CHỈ LẤY NỘI DUNG SỐ NGUYÊN BẢN (Ví dụ từ Ngay_0902 bóc ra thành 0902, bỏ qua phần tháng)
-                    globalDay = dayRaw.replace(/[^0-9]/g, '');
+                    // 1. Chỉ lọc ra các chữ số để lấy đúng 4 số đầu tiên làm ngày chụp
+                    const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
+                    let finalDayStr = digitsOnly.substring(0, 4); 
 
+                    // 2. Chuyển đổi chuỗi chữ thô ban đầu thành chữ thường để so sánh hậu tố phân khu dịch vụ
+                    const lowerDayRaw = dayRaw.toLowerCase();
+                    if (lowerDayRaw.includes('z')) {
+                        finalDayStr += " / Zipline";
+                    } else if (lowerDayRaw.includes('n')) {
+                        finalDayStr += " / Roller Coaster";
+                    } else if (lowerDayRaw.includes('c')) {
+                        finalDayStr += " / Water Park";
+                    }
+
+                    globalDay = finalDayStr;
                     driveLink.href = googleDriveUrl;
                     
-                    // Chạy dịch tự động (Mặc định hiển thị ngôn ngữ English)
+                    detectDeviceLanguage();
                     switchLang(currentLang);
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
