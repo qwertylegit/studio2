@@ -49,17 +49,8 @@
             </div>
             <div id="reader"></div>
         </div>
-
-        <div id="downloadView">
-            <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
-            
-            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Download Video/Photo</h2>
-            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 25px;"></h4>
-            
-            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
-            
-            <p class="note">
-                <b>Note:</b> Please click the button <b>Google Drive</b> above to view and download to your device.<br><br>
+<p class="note">
+                <b>Read first:</b> Please click the button <b>Google Drive</b> above to view and download to your device.<br><br>
                 
                 Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br><br>
                 
@@ -69,6 +60,15 @@
                 ⚠️ <i>This QR code is valid for 1 month.</i>
             </p>  
         </div>
+        <div id="downloadView">
+            <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
+            
+            <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Download Video/Photo</h2>
+            <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 25px;"></h4>
+            
+            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
+            
+            
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 15px;">by @Sanviet</div>
     </div>
@@ -116,7 +116,7 @@
 
                     // Cập nhật thông tin lên giao diện
                     albumTitle.innerText = `Album: ${customerName}`;
-                    albumDate.innerText = `Date: ${cleanDay}/${cleanMonth}`; // Định dạng chuẩn Date: DD/MM
+                    albumDate.innerText = `Date: ${cleanDay}`; // Định dạng chuẩn Date: DD/MM /${cleanMonth}
                     driveLink.href = googleDriveUrl;
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
