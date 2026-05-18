@@ -127,9 +127,9 @@
         let globalDay = ""; 
         let currentLang = "en"; 
         
-        // Trạng thái nút bấm: 'checking' (đang kiểm tra), 'ready' (đã có file), 'empty' (chưa có file/bị khóa ẩn)
+        // Trạng thái nút: 'checking', 'ready', 'empty'
         let buttonState = "checking"; 
-        const COOLDOWN_TIME = 30; // Thời gian khóa ẩn chống spam API (30 giây)
+        const COOLDOWN_TIME = 30; 
 
         const dictionary = {
             vi: {
@@ -152,8 +152,8 @@
                 title: "Номер кода", date: "Дата", 
                 btnReady: "СКАЧАТЬ С GOOGLE DRIVE",
                 btnChecking: "ПРОВЕРКА ДАННЫХ...",
-                btnEmpty: "ЗАГРУЗКА ĐАННЫХ... ПОЖАЛУЙСТА, ПОPROБУЙТЕ ПОЗЖЕ.",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Nếu статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
+                btnEmpty: "ЗАГРУЗКА ДАННЫХ... ПОЖАЛУЙСТА, ПОПРОБУЙТЕ ПОЗЖЕ.",
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
                 instruction: `<br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и скачать на свое устройство.`
             },
             zh: {
@@ -161,7 +161,7 @@
                 btnReady: "通过 GOOGLE DRIVE 下载", 
                 btnChecking: "正在检查数据...",
                 btnEmpty: "数据正在上传中... 请稍后再试。",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
+                content: `<b>下载前必读:</b><br>数据同步 to 云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
                 instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
             ko: {
@@ -184,7 +184,6 @@
             }
         }
 
-        // Cập nhật giao diện nút bấm
         function renderButtonUI() {
             const data = dictionary[currentLang];
             const driveLink = document.getElementById('driveLink');
@@ -196,7 +195,6 @@
                 actionInst.innerHTML = data.instruction; 
                 actionInst.style.display = "inline"; 
             } else if (buttonState === "empty") {
-                // Thư mục trống hoặc đang trong thời gian khóa ẩn -> Đều hiện chữ tĩnh "Đang xử lý..."
                 driveLink.innerText = data.btnEmpty;
                 driveLink.classList.add('btn-processing');
                 actionInst.innerHTML = "";
@@ -231,7 +229,7 @@
             return decodeURIComponent(escape(window.atob(str)));
         }
 
-        // LUỒNG XỬ LÝ CHÍNH KHÔNG HIỂN THỊ ĐẾM GIÂY
+        // LUỒNG XỬ LÝ CHÍNH
         const urlParams = new URLSearchParams(window.location.search);
         const encryptedData = urlParams.get('data');
         const qrView = document.getElementById('qrView');
@@ -267,45 +265,51 @@
                     globalDay = finalDayStr;
 
                     detectDeviceLanguage();
-                    switchLang(currentLang);
 
                     if (!folderId || folderId === "undefined") {
                         buttonState = "empty";
-                        renderButtonUI();
+                        switchLang(currentLang);
                     } else {
+                        const successKey = "success_folder_" + folderId;
                         const storageKey = "cooldown_" + folderId;
-                        const savedCooldownTimestamp = localStorage.getItem(storageKey);
-                        const now = Date.now();
 
-                        // KIỂM TRA KHÓA ẨN CHỐNG SPAM
-                        if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
-                            // Trường hợp: Vẫn trong thời gian 30s khóa ẩn -> Giữ nguyên chữ tĩnh, chặn không gọi API
-                            buttonState = "empty";
-                            renderButtonUI();
+                        if (localStorage.getItem(successKey) === "true") {
+                            // Đã từng check thành công mã này trước đó -> Cho tải luôn không gọi API
+                            buttonState = "ready";
+                            switchLang(currentLang);
                         } else {
-                            // Trường hợp: Hết thời gian khóa ẩn hoặc lần đầu vào -> Hiện chữ kiểm tra dữ liệu và chạy fetch
-                            buttonState = "checking";
-                            renderButtonUI();
+                            const savedCooldownTimestamp = localStorage.getItem(storageKey);
+                            const now = Date.now();
 
-                            fetch(`${appsScriptUrl}?action=check_status&folder_id=${folderId}&token=${secretToken}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
-                                        buttonState = "ready";
-                                        localStorage.removeItem(storageKey); // Đã có file thì hủy khóa luôn
-                                    } else {
-                                        buttonState = "empty";
-                                        // Ghi nhận mốc thời gian khóa ẩn 30s mới vào localStorage
-                                        const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
-                                        localStorage.setItem(storageKey, activeUntil.toString());
-                                    }
-                                    renderButtonUI();
-                                })
-                                .catch(err => {
-                                    console.error("API Error: ", err);
-                                    buttonState = "ready"; // Fallback bẫy lỗi mạng để khách tự vào Drive check
-                                    renderButtonUI();
-                                });
+                            if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
+                                // Vẫn đang bị khóa ngầm 30s đối với mã này -> Hiện chữ Đang xử lý tĩnh
+                                buttonState = "empty";
+                                switchLang(currentLang);
+                            } else {
+                                // Đủ điều kiện gọi API để kiểm tra thời gian thực
+                                buttonState = "checking";
+                                switchLang(currentLang);
+
+                                fetch(`${appsScriptUrl}?action=check_status&folder_id=${folderId}&token=${secretToken}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
+                                            buttonState = "ready";
+                                            localStorage.setItem(successKey, "true"); // Khóa thành công riêng cho folderId này
+                                            localStorage.removeItem(storageKey); 
+                                        } else {
+                                            buttonState = "empty";
+                                            const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
+                                            localStorage.setItem(storageKey, activeUntil.toString()); // Khóa ngầm 30s folderId này
+                                        }
+                                        renderButtonUI();
+                                    })
+                                    .catch(err => {
+                                        console.error("API Error: ", err);
+                                        buttonState = "ready"; 
+                                        renderButtonUI();
+                                    });
+                            }
                         }
                     }
                 } else {
