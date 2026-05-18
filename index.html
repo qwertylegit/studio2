@@ -6,80 +6,80 @@
     <title>Download Video- Anhdulich.vn</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f7f9; }
-        .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f7f9; } [cite: 1, 2]
+        .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; margin: auto; } [cite: 2, 3, 4]
         
         .btn { 
-            display: inline-block; 
-            box-sizing: border-box;
+            display: inline-block;
+            box-sizing: border-box; [cite: 5]
             width: 100%;
             max-width: 320px; 
             padding: 18px; 
             border-radius: 15px; 
             font-weight: bold; 
             text-decoration: none; 
-            margin: 20px auto 0 auto; 
-            font-size: 17px; 
+            margin: 20px auto 0 auto;
+            font-size: 17px; [cite: 6]
             transition: 0.2s; 
         }
         .btn-drive { 
-            background: #1a73e8; 
-            color: white; 
+            background: #1a73e8;
+            color: white; [cite: 6, 7]
             box-shadow: 0 4px 15px rgba(26,115,232,0.3); 
         }
-        .btn-drive:hover { background: #1557b0; }
+        .btn-drive:hover { background: #1557b0; } [cite: 7, 8]
 
         .btn-processing {
             background: #a0aec0 !important;
-            color: #fff !important;
+            color: #fff !important; [cite: 8, 9]
             box-shadow: none !important;
             pointer-events: none; 
             cursor: not-allowed;
-        }
+        } [cite: 9, 10]
         
         p.note { 
-            font-size: 13.5px; 
-            color: #4a5568; 
+            font-size: 13.5px;
+            color: #4a5568; [cite: 10, 11]
             line-height: 1.6; 
             margin-top: 20px; 
             text-align: left; 
             background: #fff9db; 
             padding: 18px; 
             border-radius: 16px; 
-            border: 1px solid #ffe066; 
-        }
+            border: 1px solid #ffe066;
+        } [cite: 11, 12]
 
         .lang-switcher {
             display: flex;
-            justify-content: center;
+            justify-content: center; [cite: 12, 13]
             gap: 8px;
             margin: 15px 0 5px 0;
         }
         .lang-btn {
             background: #fff;
-            border: 1px solid #cbd5e0;
+            border: 1px solid #cbd5e0; [cite: 13, 14]
             padding: 4px 8px;
             font-size: 18px; 
             line-height: 1;
             border-radius: 8px;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); [cite: 14, 15]
         }
         .lang-btn.active {
             background: #e2e8f0;
-            border-color: #4a5568;
+            border-color: #4a5568; [cite: 15, 16]
         }
 
-        .scan-section { display: flex; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 20px; border: 1px dashed #cbd5e0; margin-bottom: 20px; }
-        .logo-qr { width: 50px; height: 50px; margin-right: 15px; opacity: 0.6; }
-        .scan-text { text-align: left; flex: 1; }
-        .scan-text b { font-size: 15px; color: #2c3e50; }
-        .scan-text p { margin: 3px 0 0; font-size: 12px; color: #7f8c8d; }
+        .scan-section { display: flex; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 20px; border: 1px dashed #cbd5e0; margin-bottom: 20px; } [cite: 16, 17]
+        .logo-qr { width: 50px; height: 50px; margin-right: 15px; opacity: 0.6; } [cite: 17, 18]
+        .scan-text { text-align: left; flex: 1; } [cite: 18, 19]
+        .scan-text b { font-size: 15px; color: #2c3e50; } [cite: 19, 20]
+        .scan-text p { margin: 3px 0 0; font-size: 12px; color: #7f8c8d; } [cite: 20, 21]
         
-        .btn-open-cam { background: #007aff; color: white; border: none; padding: 12px 15px; border-radius: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin-top: 15px; display: none; }
-        .hidden { display: none !important; }
+        .btn-open-cam { background: #007aff; color: white; border: none; padding: 12px 15px; border-radius: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; } [cite: 21, 22, 23]
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin-top: 15px; display: none; } [cite: 23, 24]
+        .hidden { display: none !important; } [cite: 24, 25]
     </style>
 </head>
 <body>
@@ -90,7 +90,7 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/241/241528.png" class="logo-qr">
                 <div class="scan-text">
                     <b>Quét mã QR</b>
-                    <p>Để bắt đầu tải album</p>
+                    <p>Để bắt đầu tải album</p> [cite: 25, 26]
                 </div>
                 <button class="btn-open-cam" id="btnStartScan">CAMERA</button>
             </div>
@@ -98,20 +98,20 @@
         </div>
 
         <div id="downloadView">
-            <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" width="60" style="margin-bottom:15px;"> [cite: 26, 27]
             
             <h2 id="albumTitle" style="color:#2c3e50; margin-bottom: 5px;">Code number: ---</h2>
             <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 0;">Date: ----</h4>
             
             <div class="lang-switcher">
-                <button class="lang-btn" onclick="switchLang('vi')">🇻🇳</button>
+                <button class="lang-btn" onclick="switchLang('vi')">🇻🇳</button> [cite: 27, 28]
                 <button class="lang-btn" onclick="switchLang('en')">🇬🇧</button>
                 <button class="lang-btn" onclick="switchLang('ru')">🇷🇺</button>
                 <button class="lang-btn" onclick="switchLang('zh')">🇨🇳</button>
                 <button class="lang-btn" onclick="switchLang('ko')">🇰🇷</button>
             </div>
 
-            <p class="note">
+            <p class="note"> [cite: 28, 29]
                 <span id="noteContent"></span>
                 <span id="actionInstruction"></span>
             </p>  
@@ -119,7 +119,7 @@
             <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
         </div>
 
-        <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div>
+        <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div> [cite: 29, 30]
     </div>
 
     <script>
@@ -128,8 +128,7 @@
         let currentLang = "en"; 
         let isDriveFolderReady = false; 
         
-        // Cấu hình số giây khóa chống spam giữa mỗi lần gọi API (Mặc định: 30 giây)
-        const COOLDOWN_TIME = 30; 
+        const COOLDOWN_TIME = 30; [cite: 30, 31]
         let countdownTimer = null;
         let secondsLeft = 0;
 
@@ -137,7 +136,7 @@
             const browserLang = navigator.language || navigator.userLanguage;
             const shortLang = browserLang.toLowerCase().split('-')[0]; 
             if (['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang)) {
-                currentLang = shortLang;
+                currentLang = shortLang; [cite: 31, 32]
             } else {
                 currentLang = 'en'; 
             }
@@ -145,78 +144,79 @@
 
         const dictionary = {
             vi: {
-                title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE", 
+                title: "Mã số khách", 
+                date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE", [cite: 32, 33]
                 btnLoading: "ĐANG XỬ LÝ UPLOAD... VUI LÒNG THỬ LẠI SAU.",
                 btnCooldown: "VUI LÒNG ĐỢI {sec}S ĐỂ KIỂM TRA LẠI...",
-                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu trạng thái báo "ĐANG XỬ LÝ UPLOAD", bạn vui lòng thử lại sau.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i>`,
+                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. [cite: 33, 34]
+Nếu trạng thái báo "ĐANG XỬ LÝ UPLOAD", bạn vui lòng thử lại sau.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i>`,
                 instruction: `<br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
             },
             en: {
-                title: "Code number", date: "Date", btn: "DOWNLOAD WITH GOOGLE DRIVE", 
+                title: "Code number", date: "Date", btn: "DOWNLOAD WITH GOOGLE DRIVE", [cite: 34, 35]
                 btnLoading: "UPLOADING DATA... PLEASE TRY AGAIN LATER.",
                 btnCooldown: "PLEASE WAIT {sec}S TO RE-CHECK...",
-                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the button states "UPLOADING DATA", please try again later.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i>`,
+                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. [cite: 35, 36]
+If the button states "UPLOADING DATA", please try again later.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i>`,
                 instruction: `<br>Please click the button <b>Google Drive</b> below to view and download to your device.`
             },
             ru: {
-                title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE", 
+                title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE", [cite: 36, 37]
                 btnLoading: "ЗАГРУЗКА ДАННЫХ... ПОЖАЛУЙСТА, ПОPROБУЙТЕ ПОЗЖЕ.",
                 btnCooldown: "ПОЖАЛУЙСТА, PODOZHDITE {sec}S...",
-                content: `<b>Прочтите trước khi tải:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
+                content: `<b>Прочтите trước khi tải:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. [cite: 37, 38]
+Если статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
                 instruction: `<br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и descargar на свое устройство.`
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载", 
-                btnLoading: "数据正在上传中... 请稍后再试。",
+                btnLoading: "数据正在上传中... 请稍后再试。", [cite: 38, 39]
                 btnCooldown: "请等待 {sec} 秒后重新 check...",
                 content: `<b>下载前必读:</b><br>数据同步 to 云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i>`,
-                instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看 and 下载。`
             },
-            ko: {
+            ko: { [cite: 39, 40]
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드", 
                 btnLoading: "데이터 업로드 중... 나중에 다시 시도해 주세요.",
                 btnCooldown: "재확인하려면 {sec}초간 기다려주세요...",
-                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 상태가 "데이터 업로드 중"으로 표시되면 나중에 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i>`,
+                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. [cite: 40, 41]
+상태가 "데이터 업로드 중"으로 표시되면 나중에 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i>`,
                 instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
         function startCooldownVisual(seconds) {
-            secondsLeft = seconds;
+            secondsLeft = seconds; [cite: 42]
             if (countdownTimer) clearInterval(countdownTimer);
-
-            countdownTimer = setInterval(() => {
+            countdownTimer = setInterval(() => { [cite: 42, 43]
                 secondsLeft--;
                 if (secondsLeft <= 0) {
                     clearInterval(countdownTimer);
-                    // Hết thời gian khóa ngầm -> Tự reload trang để kích hoạt check API thực tế lần tiếp theo
-                    window.location.reload(); 
+                    window.location.reload(); [cite: 43, 44]
                 } else {
                     updateButtonUI();
                 }
             }, 1000);
-        }
+        } [cite: 44, 45]
 
         function updateButtonUI() {
-            const data = dictionary[currentLang];
+            const data = dictionary[currentLang]; [cite: 45, 46]
             const driveLink = document.getElementById('driveLink');
-            const actionInst = document.getElementById('actionInstruction');
+            const actionInst = document.getElementById('actionInstruction'); [cite: 46, 47]
 
             if (isDriveFolderReady) {
                 driveLink.innerText = data.btn;
-                driveLink.classList.remove('btn-processing');
+                driveLink.classList.remove('btn-processing'); [cite: 46, 47]
                 actionInst.innerHTML = data.instruction; 
                 actionInst.style.display = "inline"; 
             } else if (secondsLeft > 0) {
-                // Đang trong trạng thái đếm ngược chặn API
                 driveLink.innerText = data.btnCooldown.replace("{sec}", secondsLeft);
-                driveLink.classList.add('btn-processing');
+                driveLink.classList.add('btn-processing'); [cite: 47, 48]
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
             } else {
-                // Trạng thái chờ gọi hoặc lỗi
                 driveLink.innerText = data.btnLoading;
-                driveLink.classList.add('btn-processing');
+                driveLink.classList.add('btn-processing'); [cite: 48, 49]
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
             }
@@ -224,140 +224,131 @@
 
         function switchLang(lang) {
             currentLang = lang;
-            const buttons = document.querySelectorAll('.lang-btn');
+            const buttons = document.querySelectorAll('.lang-btn'); [cite: 49, 50]
             buttons.forEach(btn => {
                 if(btn.getAttribute('onclick').includes(`'${lang}'`)) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
-
-            const data = dictionary[lang];
+            const data = dictionary[lang]; [cite: 50, 51]
             document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
             document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; 
             document.getElementById('noteContent').innerHTML = data.content;
 
             updateButtonUI();
-        }
+        } [cite: 51, 52]
 
         function decodeAdvanced(base64) {
-            let str = base64.replace(/-/g, '+').replace(/_/g, '/');
+            let str = base64.replace(/-/g, '+').replace(/_/g, '/'); [cite: 52, 53]
             while (str.length % 4) { str += '='; }
             return decodeURIComponent(escape(window.atob(str)));
-        }
+        } [cite: 53, 54]
 
         const urlParams = new URLSearchParams(window.location.search);
-        const encryptedData = urlParams.get('data');
-
+        const encryptedData = urlParams.get('data'); [cite: 54, 55]
         const qrView = document.getElementById('qrView');
-        const downloadView = document.getElementById('downloadView');
+        const downloadView = document.getElementById('downloadView'); [cite: 55, 56]
         const driveLink = document.getElementById('driveLink');
 
         if (!encryptedData) {
             qrView.classList.remove('hidden');
-            downloadView.classList.add('hidden');
+            downloadView.classList.add('hidden'); [cite: 56, 57]
         } else {
             qrView.classList.add('hidden');
-            downloadView.classList.remove('hidden');
-
+            downloadView.classList.remove('hidden'); [cite: 57, 58]
             try {
                 const decryptedString = decodeAdvanced(encryptedData);
-                const parts = decryptedString.split('|');
+                const parts = decryptedString.split('|'); [cite: 58, 59]
 
                 if (parts.length >= 6) {
-                    const dayRaw = parts[1];        
-                    globalCustomerName = parts[2];   
+                    const dayRaw = parts[1];
+                    globalCustomerName = parts[2];    [cite: 59, 60]
                     const folderId = parts[3];       
                     const scriptId = parts[4];       
-                    const secretToken = parts[5];    
-
-                    const googleDriveUrl = "https://drive.google.com/drive/folders/" + folderId;
+                    const secretToken = parts[5];
+                    const googleDriveUrl = "https://drive.google.com/drive/folders/" + folderId; [cite: 60, 61]
                     const appsScriptUrl = "https://script.google.com/macros/s/" + scriptId + "/exec";
 
                     const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
-                    let finalDayStr = digitsOnly.substring(0, 4); 
+                    let finalDayStr = digitsOnly.substring(0, 4); [cite: 61, 62]
 
                     const lowerDayRaw = dayRaw.toLowerCase();
-                    if (lowerDayRaw.includes('z')) finalDayStr += " / Zipline";
+                    if (lowerDayRaw.includes('z')) finalDayStr += " / Zipline"; [cite: 62, 63]
                     else if (lowerDayRaw.includes('n')) finalDayStr += " / Roller Coaster";
-                    else if (lowerDayRaw.includes('c')) finalDayStr += " / Water Park";
-
+                    else if (lowerDayRaw.includes('c')) finalDayStr += " / Water Park"; [cite: 63, 64]
                     globalDay = finalDayStr;
 
                     if (!folderId || folderId === "undefined") {
                         isDriveFolderReady = false;
-                        driveLink.href = "#";
+                        driveLink.href = "#"; [cite: 64, 65]
                         detectDeviceLanguage();
                         switchLang(currentLang);
                     } else {
-                        driveLink.href = googleDriveUrl;
-                        
+                        driveLink.href = googleDriveUrl; [cite: 65, 66]
                         if (folderId && scriptId && secretToken) {
                             
-                            // ⏱️ CHỐNG SPAM: Kiểm tra xem ID folder này có đang bị khóa đếm ngược không
-                            const storageKey = "cooldown_" + folderId;
+                            const storageKey = "cooldown_" + folderId; [cite: 66, 67]
                             const savedCooldownTimestamp = localStorage.getItem(storageKey);
                             const now = Date.now();
-
-                            if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
-                                // Nếu khách F5 hoặc quét lại mà vẫn chưa hết 30s cũ -> CHẶN KHÔNG GỌI API GOOGLE
+                            if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) { [cite: 67, 68]
                                 isDriveFolderReady = false;
-                                const remainingSeconds = Math.ceil((parseInt(savedCooldownTimestamp) - now) / 1000);
+                                const remainingSeconds = Math.ceil((parseInt(savedCooldownTimestamp) - now) / 1000); [cite: 68, 69]
                                 detectDeviceLanguage();
                                 startCooldownVisual(remainingSeconds);
                             } else {
-                                // Đã hết thời gian phạt hoặc mới quét lần đầu -> Cho phép gọi API kiểm tra
+                                // GỌI API KIỂM TRA TRẠNG THÁI FILE REAL-TIME
                                 fetch(`${appsScriptUrl}?action=check_status&folder_id=${folderId}&token=${secretToken}`)
-                                    .then(response => response.json())
+                                    .then(response => response.json()) [cite: 70, 71]
                                     .then(data => {
-                                        if (data.status === "success" && data.hasFiles === true) {
+                                        // CHỈNH SỬA TẠI ĐÂY: Chấp nhận linh hoạt cả kiểu boolean true và kiểu chuỗi "true"
+                                        if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
                                             isDriveFolderReady = true; 
-                                            localStorage.removeItem(storageKey); // Có file rồi thì giải phóng xóa khóa luôn
+                                            localStorage.removeItem(storageKey); 
+                                            switchLang(currentLang); // Cập nhật ngay nút Download xanh mượt
                                         } else {
                                             isDriveFolderReady = false; 
-                                            // Thư mục trống -> Tiến hành kích hoạt bộ khóa đếm ngược 30s lưu vào bộ nhớ trình duyệt
-                                            const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
+                                            const activeUntil = Date.now() + (COOLDOWN_TIME * 1000); [cite: 73, 74, 75]
                                             localStorage.setItem(storageKey, activeUntil.toString());
                                             startCooldownVisual(COOLDOWN_TIME);
                                         }
-                                        switchLang(currentLang);
                                     })
                                     .catch(err => {
-                                        console.error(err);
+                                        console.error(err); [cite: 77, 78]
                                         isDriveFolderReady = true; 
                                         switchLang(currentLang);
                                     });
                             }
                         } else {
-                            isDriveFolderReady = true;
+                            isDriveFolderReady = true; [cite: 79, 80]
                             switchLang(currentLang);
                         }
                     }
                     
-                    detectDeviceLanguage();
+                    detectDeviceLanguage(); [cite: 80, 81]
                     switchLang(currentLang);
                 } else {
                     isDriveFolderReady = false;
-                    detectDeviceLanguage();
+                    detectDeviceLanguage(); [cite: 81, 82]
                     switchLang(currentLang);
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
                 }
             } catch (error) {
                 isDriveFolderReady = false;
-                detectDeviceLanguage();
+                detectDeviceLanguage(); [cite: 83, 84]
                 switchLang(currentLang);
                 alert("Không thể giải mã dữ liệu QR: " + error.message);
             }
         }
 
-        const html5QrCode = new Html5Qrcode("reader");
+        const html5QrCode = new Html5Qrcode("reader"); [cite: 84, 85]
         document.getElementById('btnStartScan').onclick = function() {
-            this.style.display = 'none';
+            this.style.display = 'none'; [cite: 85, 86]
             document.getElementById('reader').style.display = 'block';
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                { fps: 10, qrbox: { width: 250, height: 250 } }, [cite: 86, 87]
                 (decodedText) => { window.location.href = decodedText; },
                 () => {}
-            ).catch(err => alert("Lỗi khởi tạo camera: " + err));
+            ).catch(err => alert("Lỗi khởi tạo camera: " + err)); [cite: 87, 88]
         };
     </script>
 </body>
