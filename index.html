@@ -52,7 +52,7 @@
             background: #fff;
             border: 1px solid #cbd5e0;
             padding: 2px 5px;
-            font-size: 16px; /* Tăng size để biểu tượng lá cờ hiển thị rõ ràng */
+            font-size: 16px; 
             line-height: 1;
             border-radius: 6px;
             cursor: pointer;
@@ -97,13 +97,13 @@
             <h4 id="albumDate" style="color:#7f8c8d; font-weight: normal; margin-top: 0; margin-bottom: 10px;">Ngày chụp: --/--</h4>
             
             <p class="note">
-                <div class="lang-switcher">
+                <span class="lang-switcher">
                     <button class="lang-btn active" onclick="switchLang('vi')">🇻🇳</button>
                     <button class="lang-btn" onclick="switchLang('en')">🇬🇧</button>
                     <button class="lang-btn" onclick="switchLang('ru')">🇷🇺</button>
                     <button class="lang-btn" onclick="switchLang('zh')">🇨🇳</button>
                     <button class="lang-btn" onclick="switchLang('ko')">🇰🇷</button>
-                </div>
+                </span>
 
                 <span id="noteContent">
                     <b>Đọc trước khi tải:</b><br>
@@ -124,13 +124,11 @@
     </div>
 
     <script>
-        // Khai báo biến lưu trữ dữ liệu giải mã toàn cục
         let globalCustomerName = "";
         let globalDay = "";
         let globalMonth = "";
-        let currentLang = "vi"; // Ngôn ngữ mặc định ban đầu là Tiếng Việt
+        let currentLang = "vi"; 
 
-        // Kho lưu trữ từ điển đa ngôn ngữ (VI - EN - RU - ZH - KO)
         const dictionary = {
             vi: {
                 title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE",
@@ -146,7 +144,7 @@
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求 backend 协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br><br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br><br>⚠️ <i>此二维码有效期为1个月。</i><br><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看และ下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드",
@@ -154,14 +152,11 @@
             }
         };
 
-        // Hàm chuyển đổi ngôn ngữ nhanh bằng Javascript thuần
         function switchLang(lang) {
             currentLang = lang;
             
-            // Xử lý bật/tắt class hiệu ứng active cho các nút cờ
             const buttons = document.querySelectorAll('.lang-btn');
             buttons.forEach(btn => {
-                // Kiểm tra thuộc tính onclick để nhận biết nút chính xác
                 if(btn.getAttribute('onclick').includes(`'${lang}'`)) {
                     btn.classList.add('active');
                 } else {
@@ -169,7 +164,6 @@
                 }
             });
 
-            // Gán dữ liệu tương ứng trong từ điển lên giao diện
             const data = dictionary[lang];
             document.getElementById('albumTitle').innerText = `${data.title}: ${globalCustomerName}`;
             document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}/${globalMonth}`;
@@ -177,7 +171,6 @@
             document.getElementById('noteContent').innerHTML = data.content;
         }
 
-        // Hàm giải mã WebSafe Base64 của Google
         function decodeAdvanced(base64) {
             let str = base64.replace(/-/g, '+').replace(/_/g, '/');
             while (str.length % 4) { str += '='; }
@@ -208,13 +201,10 @@
                     globalCustomerName = parts[2];   
                     const googleDriveUrl = parts[3]; 
 
-                    // Trích xuất số nguyên bản
                     globalDay = dayRaw.replace(/[^0-9]/g, '');
                     globalMonth = monthRaw.replace(/[^0-9]/g, '');
 
                     driveLink.href = googleDriveUrl;
-                    
-                    // Thực thi hiển thị ngôn ngữ mặc định sau khi bóc tách xong dữ liệu (Ban đầu là VI)
                     switchLang(currentLang);
                 } else {
                     alert("Cấu trúc dữ liệu mã QR không chính xác.");
@@ -224,7 +214,6 @@
             }
         }
 
-        // --- Bộ xử lý quét mã bằng Camera trên điện thoại ---
         const html5QrCode = new Html5Qrcode("reader");
         document.getElementById('btnStartScan').onclick = function() {
             this.style.display = 'none';
