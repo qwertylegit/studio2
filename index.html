@@ -9,7 +9,6 @@
         body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f7f9; }
         .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
         
-        /* Chống co giãn sai kích thước trên giao diện máy tính */
         .btn { 
             display: inline-block; 
             box-sizing: border-box;
@@ -30,7 +29,6 @@
         }
         .btn-drive:hover { background: #1557b0; }
 
-        /* Khóa tính năng bấm chọn và chuyển xám nút Download khi chưa đồng bộ xong ảnh */
         .btn-processing {
             background: #a0aec0 !important;
             color: #fff !important;
@@ -117,7 +115,6 @@
                 <span id="noteContent">
                     <b>Read first:</b><br>
                     Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>
-                    If the file is still missing after 1 hour, please contact our hotline for assistance.<br>
                     🔹 <b>Hotline:</b> 0987 767 717<br>
                     ⚠️ <i>This QR code is valid for 1 month.</i><br>
                     Please click the button <b>Google Drive</b> below to view and download to your device.
@@ -134,7 +131,7 @@
         let globalCustomerName = "";
         let globalDay = ""; 
         let currentLang = "en"; 
-        let isDriveFolderReady = false; // Mặc định khóa lại để chờ kết quả kiểm tra thời gian thực
+        let isDriveFolderReady = false; 
 
         function detectDeviceLanguage() {
             const browserLang = navigator.language || navigator.userLanguage;
@@ -149,23 +146,23 @@
         const dictionary = {
             vi: {
                 title: "Mã số khách", date: "Ngày chụp", btn: "TẢI VỀ BẰNG GOOGLE DRIVE", btnLoading: "ĐANG XỬ LÝ UPLOAD... VUI LÒNG CHỜ ÍT PHÚT",
-                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br>Nếu sau 1 giờ vẫn thiếu file, vui lòng liên hệ hotline để được hỗ trợ.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
+                content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu tệp không xuất hiện sau khi nhấn tải xuống, vui lòng thử lại sau.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i><br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
             },
             en: {
                 title: "Code number", date: "Date", btn: "DOWNLOAD WITH GOOGLE DRIVE", btnLoading: "UPLOADING DATA... PLEASE WAIT A MOMENT",
-                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>If the file is still missing after 1 hour, please contact our hotline for assistance.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i><br>Please click the button <b>Google Drive</b> below to view and download to your device.`
+                content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the file does not appear after clicking download, please try again later.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i><br>Please click the button <b>Google Drive</b> below to view and download to your device.`
             },
             ru: {
                 title: "Номер кода", date: "Дата", btn: "СКАЧАТЬ С GOOGLE DRIVE", btnLoading: "ЗАГРУЗКА ДАННЫХ... ПОЖАЛУЙСТА, ПОДОЖДИТЕ",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br>Если файл по-прежнему отсутствует через 1 час, обратитесь за помощью на нашу горячую линию.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если файл не появляется после нажатия кнопки загрузки, повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i><br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и загрузить на свое устройство.`
             },
             zh: {
                 title: "客户编号", date: "拍摄日期", btn: "通过 GOOGLE DRIVE 下载", btnLoading: "数据正在上传中... 请稍候片刻",
-                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br>如果1小时后文件仍然丢失，请拨打我们的热线电话寻求协助。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+                content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果点击下载后文件未出现，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码二维码有效期为1个月。</i><br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
             ko: {
                 title: "고객 번호", date: "촬영 날짜", btn: "GOOGLE DRIVE로 다운로드", btnLoading: "데이터 업로드 중... 잠시만 기다려주세요",
-                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br>1시간이 지난 후에도 파일이 없는 경우 당사 핫라인으로 문의하여 도움을 받으세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
+                content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 다운로드를 클릭한 후 파일이 나타나지 않으면 나중에 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i><br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
@@ -216,14 +213,15 @@
                 const decryptedString = decodeAdvanced(encryptedData);
                 const parts = decryptedString.split('|');
 
-                // Đọc cấu trúc 7 phần thông tin bóc từ chuỗi mã hóa QR của khách
-                if (parts.length >= 7) {
+                if (parts.length >= 6) {
                     const dayRaw = parts[1];        
                     globalCustomerName = parts[2];   
-                    const googleDriveUrl = parts[3]; 
-                    const folderId = parts[4];       
-                    const appsScriptUrl = parts[5];  
-                    const secretToken = parts[6];    // Tự động lấy token đi kèm theo QR
+                    const folderId = parts[3];       
+                    const scriptId = parts[4];       
+                    const secretToken = parts[5];    
+
+                    const googleDriveUrl = "https://drive.google.com/drive/folders/" + folderId;
+                    const appsScriptUrl = "https://script.google.com/macros/s/" + scriptId + "/exec";
 
                     const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
                     let finalDayStr = digitsOnly.substring(0, 4); 
@@ -235,7 +233,7 @@
 
                     globalDay = finalDayStr;
 
-                    if (!googleDriveUrl || googleDriveUrl.includes("anhdulich.vn")) {
+                    if (!folderId || folderId === "undefined") {
                         isDriveFolderReady = false;
                         driveLink.href = "#";
                         detectDeviceLanguage();
@@ -243,21 +241,20 @@
                     } else {
                         driveLink.href = googleDriveUrl;
                         
-                        // ⏱️ GỌI KIỂM TRA THỜI GIAN THỰC SỬ DỤNG LINK VÀ MÃ KHÓA TRONG QR
-                        if (folderId && appsScriptUrl && secretToken) {
+                        if (folderId && scriptId && secretToken) {
                             fetch(`${appsScriptUrl}?action=check_status&folder_id=${folderId}&token=${secretToken}`)
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.status === "success" && data.hasFiles === true) {
-                                        isDriveFolderReady = true; // Thư mục đã có file thực tế, mở nút màu xanh công khai
+                                        isDriveFolderReady = true; 
                                     } else {
-                                        isDriveFolderReady = false; // Thư mục trống rỗng, tiếp tục giữ nút xám xử lý upload
+                                        isDriveFolderReady = false; 
                                     }
                                     switchLang(currentLang);
                                 })
                                 .catch(err => {
-                                    console.error("Lỗi:", err);
-                                    isDriveFolderReady = true; // Phòng hờ hiếm khi lỗi mạng thì mở luôn link tránh nghẽn
+                                    console.error(err);
+                                    isDriveFolderReady = true; 
                                     switchLang(currentLang);
                                 });
                         } else {
