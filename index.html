@@ -36,6 +36,24 @@
             pointer-events: none; 
             cursor: not-allowed;
         }
+
+        /* Màu đỏ nổi bật cho mã không tồn tại */
+        .btn-danger {
+            background: #e53e3e !important;
+            color: #fff !important;
+            box-shadow: none !important;
+            pointer-events: none; 
+            cursor: not-allowed;
+        }
+
+        /* Màu kích hoạt cho nút bấm chủ động kiểm tra lại khi hết 1 phút phạt */
+        .btn-recheck {
+            background: #2cb67d !important;
+            color: #fff !important;
+            box-shadow: 0 4px 15px rgba(44,182,125,0.3);
+            cursor: pointer;
+        }
+        .btn-recheck:hover { background: #239a68 !important; }
         
         p.note { 
             font-size: 13.5px;
@@ -116,7 +134,7 @@
                 <span id="actionInstruction"></span>
             </p>  
 
-            <a id="driveLink" href="#" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
+            <a id="driveLink" href="#" onclick="handleButtonClick(event)" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
         </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet</div>
@@ -127,9 +145,15 @@
         let globalDay = ""; 
         let currentLang = "en"; 
         
-        // Trạng thái nút: 'checking', 'ready', 'empty'
+        // Trạng thái: 'checking', 'ready', 'empty', 'not_found', 'need_recheck'
         let buttonState = "checking"; 
-        const COOLDOWN_TIME = 30; 
+        const COOLDOWN_TIME = 60; // 🌟 TĂNG THỜI GIAN PHẠT LÊN 1 PHÚT (60 GIÂY)
+        let countdownTimer = null;
+        let secondsLeft = 0;
+
+        let currentFolderId = "";
+        let currentAppsScriptUrl = "";
+        let currentSecretToken = "";
 
         const dictionary = {
             vi: {
@@ -137,6 +161,9 @@
                 btnReady: "TẢI VỀ BẰNG GOOGLE DRIVE",
                 btnChecking: "ĐANG KIỂM TRA DỮ LIỆU...",
                 btnEmpty: "ĐANG XỬ LÝ UPLOAD... VUI LÒNG THỬ LẠI SAU.",
+                btnNotFound: "MÃ QR KHÔNG TỒN TẠI HOẶC ĐÃ HẾT HẠN",
+                btnCooldown: "VUI LÒNG ĐỢI {sec}S ĐỂ KIỂM TRA LẠI...",
+                btnNeedRecheck: "BẤM ĐỂ KIỂM TRA LẠI DỮ LIỆU",
                 content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu trạng thái báo "ĐANG XỬ LÝ UPLOAD", bạn vui lòng thử lại sau.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i>`,
                 instruction: `<br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
             },
@@ -145,6 +172,9 @@
                 btnReady: "DOWNLOAD WITH GOOGLE DRIVE",
                 btnChecking: "CHECKING DATA...",
                 btnEmpty: "UPLOADING DATA... PLEASE TRY AGAIN LATER.",
+                btnNotFound: "QR CODE DOES NOT EXIST OR HAS EXPIRED",
+                btnCooldown: "PLEASE WAIT {sec}S TO RE-CHECK...",
+                btnNeedRecheck: "CLICK TO RE-CHECK DATA",
                 content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If the button states "UPLOADING DATA", please try again later.<br>🔹 <b>Hotline:</b> 0987 767 717<br>⚠️ <i>This QR code is valid for 1 month.</i>`,
                 instruction: `<br>Please click the button <b>Google Drive</b> below to view and download to your device.`
             },
@@ -153,7 +183,10 @@
                 btnReady: "СКАЧАТЬ С GOOGLE DRIVE",
                 btnChecking: "ПРОВЕРКА ДАННЫХ...",
                 btnEmpty: "ЗАГРУЗКА ДАННЫХ... ПОЖАЛУЙСТА, ПОПРОБУЙТЕ ПОЗЖЕ.",
-                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если статус показывает "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
+                btnNotFound: "QR-КОД НЕ СУЩЕСТВУЕТ ИЛИ ИСТЕК",
+                btnCooldown: "ПОЖАЛУЙСТА, ПОДОЖДИТЕ {sec}S...",
+                btnNeedRecheck: "НАЖМИТЕ ĐЛЯ ПОВТОРНОЙ ПОВЕРКИ",
+                content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Nếu статус và trạng thái báo "ЗАГРУЗКА ДАННЫХ", повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0987 767 717<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
                 instruction: `<br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и скачать на свое устройство.`
             },
             zh: {
@@ -161,6 +194,9 @@
                 btnReady: "通过 GOOGLE DRIVE 下载", 
                 btnChecking: "正在检查数据...",
                 btnEmpty: "数据正在上传中... 请稍后再试。",
+                btnNotFound: "二维码不存在或已过期",
+                btnCooldown: "请等待 {sec} 秒后重新检查...",
+                btnNeedRecheck: "点击重新 check 数据",
                 content: `<b>下载前必读:</b><br>数据同步 to 云端大约需要15到30分钟。如果状态显示 “数据正在上传中”，请稍后再试。<br>🔹 <b>服务热线:</b> 0987 767 717<br>⚠️ <i>此二维码有效期为1个月。</i>`,
                 instruction: `<br>请点击下方的 <b>Google Drive</b> 按钮在您的设备上查看和下载。`
             },
@@ -169,19 +205,31 @@
                 btnReady: "GOOGLE DRIVE로 다운로드", 
                 btnChecking: "데이터 확인 중...",
                 btnEmpty: "데이터 업로드 중... 나중에 다시 시도해 주세요.",
+                btnNotFound: "QR 코드가 존재하지 않거나 만료되었습니다",
+                btnCooldown: "재확인하려면 {sec}초간 기다려주세요...",
+                btnNeedRecheck: "데이터를 재확인하려면 클릭하세요",
                 content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 상태가 "데이터 업로드 중"으로 표시되면 나중에 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0987 767 717<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i>`,
                 instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
             }
         };
 
+        function startCooldownVisual(seconds) {
+            secondsLeft = seconds;
+            if (countdownTimer) clearInterval(countdownTimer);
+            countdownTimer = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    buttonState = "need_recheck"; // Hết 1 phút đổi sang nút Cho phép Check lại chủ động
+                }
+                renderButtonUI();
+            }, 1000);
+        }
+
         function detectDeviceLanguage() {
             const browserLang = navigator.language || navigator.userLanguage;
             const shortLang = browserLang.toLowerCase().split('-')[0]; 
-            if (['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang)) {
-                currentLang = shortLang;
-            } else {
-                currentLang = 'en'; 
-            }
+            currentLang = ['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang) ? shortLang : 'en';
         }
 
         function renderButtonUI() {
@@ -189,11 +237,27 @@
             const driveLink = document.getElementById('driveLink');
             const actionInst = document.getElementById('actionInstruction');
 
+            driveLink.classList.remove('btn-processing', 'btn-danger', 'btn-recheck');
+
             if (buttonState === "ready") {
                 driveLink.innerText = data.btnReady;
-                driveLink.classList.remove('btn-processing');
                 actionInst.innerHTML = data.instruction; 
                 actionInst.style.display = "inline"; 
+            } else if (buttonState === "not_found") {
+                driveLink.innerText = data.btnNotFound;
+                driveLink.classList.add('btn-danger'); 
+                actionInst.innerHTML = "";
+                actionInst.style.display = "none";
+            } else if (secondsLeft > 0) {
+                driveLink.innerText = data.btnCooldown.replace("{sec}", secondsLeft);
+                driveLink.classList.add('btn-processing');
+                actionInst.innerHTML = "";
+                actionInst.style.display = "none";
+            } else if (buttonState === "need_recheck") {
+                driveLink.innerText = data.btnNeedRecheck;
+                driveLink.classList.add('btn-recheck');
+                actionInst.innerHTML = "";
+                actionInst.style.display = "none";
             } else if (buttonState === "empty") {
                 driveLink.innerText = data.btnEmpty;
                 driveLink.classList.add('btn-processing');
@@ -204,6 +268,44 @@
                 driveLink.classList.add('btn-processing');
                 actionInst.innerHTML = "";
                 actionInst.style.display = "none";
+            }
+        }
+
+        // HÀM GỌI API THỜI GIAN THỰC
+        function triggerCheckStatusAPI() {
+            buttonState = "checking";
+            renderButtonUI();
+
+            fetch(`${currentAppsScriptUrl}?action=check_status&folder_id=${currentFolderId}&token=${currentSecretToken}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
+                        buttonState = "ready"; // 🌟 ĐÃ CÓ FILE: Chuyển sang nút Download và GIỮ YÊN TRẠNG THÁI (không check lại nữa)
+                        const storageKey = "cooldown_" + currentFolderId;
+                        localStorage.removeItem(storageKey); 
+                    } else {
+                        buttonState = "empty"; // THƯ MỤC TRỐNG: Kích hoạt đếm ngược phạt 1 phút chống spam
+                        const storageKey = "cooldown_" + currentFolderId;
+                        const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
+                        localStorage.setItem(storageKey, activeUntil.toString());
+                        startCooldownVisual(COOLDOWN_TIME);
+                    }
+                    renderButtonUI();
+                })
+                .catch(err => {
+                    // 🌟 LỖI KẾT NỐI/XÓA MẤT THƯ MỤC: Chuyển sang nút Đỏ và GIỮ YÊN TRẠNG THÁI (đứng im chờ khách F5)
+                    console.error("API Error: ", err);
+                    buttonState = "not_found"; 
+                    renderButtonUI();
+                });
+        }
+
+        function handleButtonClick(event) {
+            if (buttonState === "need_recheck") {
+                event.preventDefault(); 
+                triggerCheckStatusAPI(); 
+            } else if (buttonState !== "ready") {
+                event.preventDefault(); 
             }
         }
 
@@ -229,7 +331,7 @@
             return decodeURIComponent(escape(window.atob(str)));
         }
 
-        // LUỒNG XỬ LÝ CHÍNH
+        // LUỒNG KIỂM TRA CHẠY 1 LẦN DUY NHẤT KHI NẠP TRANG (CHO ĐẾN KHI KHÁCH ẤN F5)
         const urlParams = new URLSearchParams(window.location.search);
         const encryptedData = urlParams.get('data');
         const qrView = document.getElementById('qrView');
@@ -249,12 +351,12 @@
                 if (parts.length >= 6) {
                     const dayRaw = parts[1];
                     globalCustomerName = parts[2];   
-                    const folderId = parts[3];       
+                    currentFolderId = parts[3];       
                     const scriptId = parts[4];       
-                    const secretToken = parts[5];
+                    currentSecretToken = parts[5];
                     
-                    driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
-                    const appsScriptUrl = "https://script.google.com/macros/s/" + scriptId + "/exec";
+                    driveLink.href = "https://drive.google.com/drive/folders/" + currentFolderId;
+                    currentAppsScriptUrl = "https://script.google.com/macros/s/" + scriptId + "/exec";
 
                     const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
                     let finalDayStr = digitsOnly.substring(0, 4);
@@ -266,61 +368,37 @@
 
                     detectDeviceLanguage();
 
-                    if (!folderId || folderId === "undefined") {
-                        buttonState = "empty";
+                    if (!currentFolderId || currentFolderId === "undefined") {
+                        buttonState = "not_found"; 
                         switchLang(currentLang);
                     } else {
-                        const successKey = "success_folder_" + folderId;
-                        const storageKey = "cooldown_" + folderId;
+                        const storageKey = "cooldown_" + currentFolderId;
+                        const savedCooldownTimestamp = localStorage.getItem(storageKey);
+                        const now = Date.now();
 
-                        if (localStorage.getItem(successKey) === "true") {
-                            // Đã từng check thành công mã này trước đó -> Cho tải luôn không gọi API
-                            buttonState = "ready";
+                        if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
+                            buttonState = "empty";
+                            const remainingSeconds = Math.ceil((parseInt(savedCooldownTimestamp) - now) / 1000);
                             switchLang(currentLang);
+                            startCooldownVisual(remainingSeconds); // Nếu đang trong thời gian phạt, tiếp tục đếm nốt số giây
                         } else {
-                            const savedCooldownTimestamp = localStorage.getItem(storageKey);
-                            const now = Date.now();
-
-                            if (savedCooldownTimestamp && now < parseInt(savedCooldownTimestamp)) {
-                                // Vẫn đang bị khóa ngầm 30s đối với mã này -> Hiện chữ Đang xử lý tĩnh
-                                buttonState = "empty";
-                                switchLang(currentLang);
-                            } else {
-                                // Đủ điều kiện gọi API để kiểm tra thời gian thực
-                                buttonState = "checking";
-                                switchLang(currentLang);
-
-                                fetch(`${appsScriptUrl}?action=check_status&folder_id=${folderId}&token=${secretToken}`)
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.status === "success" && (data.hasFiles === true || data.hasFiles === "true")) {
-                                            buttonState = "ready";
-                                            localStorage.setItem(successKey, "true"); // Khóa thành công riêng cho folderId này
-                                            localStorage.removeItem(storageKey); 
-                                        } else {
-                                            buttonState = "empty";
-                                            const activeUntil = Date.now() + (COOLDOWN_TIME * 1000);
-                                            localStorage.setItem(storageKey, activeUntil.toString()); // Khóa ngầm 30s folderId này
-                                        }
-                                        renderButtonUI();
-                                    })
-                                    .catch(err => {
-                                        console.error("API Error: ", err);
-                                        buttonState = "ready"; 
-                                        renderButtonUI();
-                                    });
-                            }
+                            // Gọi kiểm tra thời gian thực duy nhất khi nạp trang
+                            triggerCheckStatusAPI();
+                            switchLang(currentLang);
                         }
                     }
                 } else {
-                    alert("Cấu trúc dữ liệu mã QR không chính xác.");
+                    buttonState = "not_found";
+                    detectDeviceLanguage();
+                    switchLang(currentLang);
                 }
             } catch (error) {
-                alert("Không thể giải mã dữ liệu QR: " + error.message);
+                buttonState = "not_found";
+                detectDeviceLanguage();
+                switchLang(currentLang);
             }
         }
 
-        // Trình quét QR bằng Camera
         const html5QrCode = new Html5Qrcode("reader");
         document.getElementById('btnStartScan').onclick = function() {
             this.style.display = 'none';
