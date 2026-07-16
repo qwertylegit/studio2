@@ -160,42 +160,58 @@
     let currentFolderId = "";
     let currentAppsScriptUrl = "";
     let currentSecretToken = "";
+    let discoveredVideos = []; // Lưu trữ danh sách file video phục vụ dịch thuật động
 
     const dictionary = {
         vi: {
             title: "Mã số khách", date: "Ngày chụp", branch: "Chi nhánh",
             btnReady: "TẢI VỀ BẰNG GOOGLE DRIVE",
             btnNotFound: "MÃ QR KHÔNG TỒN TẠI HOẶC ĐÃ HẾT HẠN",
+            btnDownloadText: "TẢI VIDEO",
+            scanningText: "🔄 Đang quét tìm các file video...",
+            emptyText: "Thư mục hiện chưa có file video nào.",
             content: `<b>Đọc trước khi tải:</b><br>Dữ liệu đồng bộ lên đám mây mất khoảng 15 đến 30 phút. Nếu không thấy file, bạn vui lòng thử lại sau ít phút.<br>🔹 <b>Hotline:</b> 0979 871 877<br>⚠️ <i>Mã QR này có giá trị sử dụng trong 1 tháng.</i>`,
-            instruction: `<br>Vui lòng bấm nút <b>Google Drive</b> phía dưới để xem và tải về thiết bị của bạn.`
+            instruction: `<br>Vui lòng bấm các nút tải video phía dưới để xem và lưu về thiết bị.`
         },
         en: {
             title: "Code number", date: "Date", branch: "Branch",
             btnReady: "DOWNLOAD WITH GOOGLE DRIVE",
             btnNotFound: "QR CODE DOES NOT EXIST OR HAS EXPIRED",
+            btnDownloadText: "DOWNLOAD VIDEO",
+            scanningText: "🔄 Scanning for video files...",
+            emptyText: "This folder does not contain any video files yet.",
             content: `<b>Read first:</b><br>Data synchronization to the cloud takes approximately 15 to 30 minutes. If you don't see files, please try again in a few minutes.<br>🔹 <b>Hotline:</b> 0979 871 877<br>⚠️ <i>This QR code is valid for 1 month.</i>`,
-            instruction: `<br>Please click the button <b>Google Drive</b> below to view and download to your device.`
+            instruction: `<br>Please click the download buttons below to view and save to your device.`
         },
         ru: {
             title: "Номер кода", date: "Дата", branch: "Филиал",
             btnReady: "СКАЧАТЬ С GOOGLE DRIVE",
             btnNotFound: "QR-КОД НЕ СУЩЕСТВУЕТ ИЛИ ИСТЕК",
+            btnDownloadText: "СКАЧАТЬ ВИДЕО",
+            scanningText: "🔄 Поиск видеофайлов...",
+            emptyText: "В этой папке пока нет видеофайлов.",
             content: `<b>Прочтите перед загрузкой:</b><br>Синхронизация данных с облаком занимает от 15 до 30 минут. Если вы không nhìn thấy file, повторите попытку позже.<br>🔹 <b>Горячая линия:</b> 0979 871 877<br>⚠️ <i>Этот QR-код действителен в течение 1 месяца.</i>`,
-            instruction: `<br>Нажмите кнопку <b>Google Drive</b> ниже, чтобы просмотреть и скачать на свое устройство.`
+            instruction: `<br>Пожалуйста, нажмите на кнопки ниже для скачивания на устройство.`
         },
         zh: {
             title: "客户编号", date: "拍摄日期", branch: "分店",
             btnReady: "通过 GOOGLE DRIVE 下载", 
             btnNotFound: "二维码不存在或已过期",
+            btnDownloadText: "下载视频",
+            scanningText: "🔄 正在扫描视频文件...",
+            emptyText: "该文件夹中目前没有任何视频文件。",
             content: `<b>下载前必读:</b><br>数据同步到云端大约需要15到30分钟。如果未看到文件，请稍后再试。<br>🔹 <b>服务热线:</b> 0979 871 877<br>⚠️ <i>此二维码有效期为1个月。</i>`,
-            instruction: `<br>请点击下方の <b>Google Drive</b> 按钮在您的设备上查看和下载。`
+            instruction: `<br>请点击下方的按钮进行下载并保存到您的设备中。`
         },
         ko: {
             title: "고객 번호", date: "촬영 날짜", branch: "지점",
             btnReady: "GOOGLE DRIVE로 다운로드", 
             btnNotFound: "QR 코드가 존재하지 않거나 만료되었습니다",
+            btnDownloadText: "동영상 다운로드",
+            scanningText: "🔄 동영상 파일을 스캔하는 중...",
+            emptyText: "이 폴더에는 아직 동영상 파일이 없습니다.",
             content: `<b>다운로드 전 필독:</b><br>클라우드 데이터 동기화는 약 15분에서 30분이 소요됩니다. 파일이 보이지 않으면 잠시 후 다시 시도해 주세요.<br>🔹 <b>핫라인:</b> 0979 871 877<br>⚠️ <i>이 QR 코드는 1개월 동안 유효합니다.</i>`,
-            instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
+            instruction: `<br>기기에 저장하려면 아래의 다운로드 버튼을 클릭하세요.`
         }
     };
 
@@ -204,90 +220,127 @@
         const shortLang = browserLang.toLowerCase().split('-')[0]; 
         currentLang = ['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang) ? shortLang : 'en';
     }
+
+    // 🚀 QUÉT FILE SỬ DỤNG FEED ĐƯỜNG DẪN XML CỦA GOOGLE DRIVE (KHÔNG CẦN API KEY)
     function setupDirectDownloadButton(folderId) {
-    const driveLink = document.getElementById('driveLink');
-    const container = document.getElementById('videoListContainer');
-    
-    // Đặt trạng thái chờ quét
-    container.innerHTML = `<p style="font-size: 13.5px; color: #7f8c8d; text-align: center; margin: 15px 0;">🔄 Đang quét tìm các file video...</p>`;
+        const driveLink = document.getElementById('driveLink');
+        const container = document.getElementById('videoListContainer');
+        const dataLang = dictionary[currentLang];
+        
+        container.innerHTML = `<p id="scanningMsg" style="font-size: 13.5px; color: #7f8c8d; text-align: center; margin: 15px 0;">${dataLang.scanningText}</p>`;
 
-    // Sử dụng API công cộng của Google Drive để lấy danh sách file trong thư mục công khai
-    const fields = "files(id,name,mimeType)";
-    const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&fields=${encodeURIComponent(fields)}&key=`; 
-    // Mẹo nhỏ: Google cho phép đọc metadata của thư mục công khai (Anyone with link) qua API này mà không cần API Key 
-    // trong một số trường hợp, hoặc bạn có thể tạo 1 API Key miễn phí trên Google Cloud Console dán vào đuôi &key=API_KEY để ổn định tuyệt đối.
+        // Sử dụng một proxy CORS miễn phí hoặc tệp nguồn cấp Feed Atom mở của Google Drive
+        // Sử dụng Feed của Google cho phép đọc cấu trúc thư mục dạng XML trực tiếp, không hạn chế API
+        const driveFeedUrl = `https://docs.google.com/feeds/metadata/public/folder/${folderId}?v=3&alt=json`;
 
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) throw new Error("API Limit or Private Folder");
-            return response.json();
-        })
-        .then(data => {
-            const files = data.files || [];
-            // Lọc ra các file có đuôi .mp4 hoặc mimeType là video
-            const videoFiles = files.filter(file => {
-                const name = file.name.toLowerCase();
-                const mime = file.mimeType ? file.mimeType.toLowerCase() : "";
-                return name.endsWith('.mp4') || mime.includes('video/mp4');
-            });
+        fetch(driveFeedUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("CORS or Private Folder");
+                return response.json();
+            })
+            .then(data => {
+                const entries = (data.feed && data.feed.entry) ? data.feed.entry : [];
+                discoveredVideos = [];
 
-            if (videoFiles.length > 0) {
-                container.innerHTML = ""; // Xóa dòng chữ chờ quét
-                driveLink.style.display = "none"; // Ẩn nút Drive gốc để khách không bị rối
-
-                // Tạo danh sách nút bấm tải trực tiếp cho từng file
-                videoFiles.forEach((file, index) => {
-                    const directUrl = `https://docs.google.com/uc?export=download&id=${file.id}`;
+                entries.forEach(entry => {
+                    const title = entry.title ? entry.title.$t : "";
+                    const idLink = entry.link ? entry.link.find(l => l.rel === "alternate") : null;
                     
-                    const btn = document.createElement('a');
-                    btn.href = directUrl;
-                    btn.className = "btn btn-drive"; // Dùng chung class CSS cũ của bạn[cite: 1]
-                    btn.style.marginTop = "10px";
-                    btn.style.background = "#2cb67d"; // Màu xanh lá bắt mắt[cite: 1]
-                    btn.style.boxShadow = "0 4px 15px rgba(44,182,125,0.3)";[cite: 1]
-                    
-                    const downloadText = currentLang === 'vi' ? 'TẢI VIDEO' : 'DOWNLOAD VIDEO';[cite: 1]
-                    btn.innerText = `🎬 ${downloadText} ${index + 1}`;[cite: 1]
-                    btn.setAttribute("download", file.name);[cite: 1]
-                    
-                    // Thêm tên file nhỏ phía dưới nút
-                    const label = document.createElement('div');
-                    label.innerText = file.name;
-                    label.style.fontSize = "11px";
-                    label.style.color = "#7f8c8d";
-                    label.style.textAlign = "center";
-                    label.style.marginTop = "3px";
-                    label.style.marginBottom = "12px";[cite: 1]
-
-                    container.appendChild(btn);
-                    container.appendChild(label);
+                    if (idLink && title.toLowerCase().endsWith(".mp4")) {
+                        // Trích xuất File ID từ đường dẫn của alternate link
+                        const urlMatch = idLink.href.match(/id=([a-zA-Z0-9-_]+)/) || idLink.href.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+                        if (urlMatch) {
+                            discoveredVideos.push({
+                                id: urlMatch[1],
+                                name: title
+                            });
+                        }
+                    }
                 });
-            } else {
-                // Thư mục trống (chưa upload xong file)
-                showFallbackLink(folderId, "Thư mục hiện chưa có file video nào.");
-            }
-        })
-        .catch(err => {
-            // Nếu API bị chặn CORS hoặc thư mục chưa chia sẻ công khai "Bất kỳ ai có liên kết đều xem được"
-            console.warn("Lỗi quét API, chuyển sang dùng link dự phòng:", err);
-            showFallbackLink(folderId);
-        });
-}
 
-// Hàm hiển thị nút dự phòng dắt khách về thẳng thư mục Drive gốc
-function showFallbackLink(folderId, customMsg) {
-    const driveLink = document.getElementById('driveLink');
-    const container = document.getElementById('videoListContainer');
-    
-    if (customMsg) {
-        container.innerHTML = `<p style="font-size: 13px; color: #e53e3e; text-align: center; margin: 10px 0;">⚠️ ${customMsg}</p>`;
-    } else {
-        container.innerHTML = "";
+                renderVideoButtons();
+            })
+            .catch(err => {
+                // FALLBACK: Nếu có bất kỳ sự cố gì dính CORS, quét ngầm trực tiếp HTML Thư mục nhúng qua proxy Google nhúng
+                console.warn("Thử phương pháp dự phòng 2...", err);
+                const proxyUrl = "https://images" + ~~(Math.random() * 10) + "-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=10&url=";
+                const targetUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}`;
+
+                fetch(proxyUrl + encodeURIComponent(targetUrl))
+                    .then(r => r.text())
+                    .then(html => {
+                        const regex = /"id":"([a-zA-Z0-9-_]{25,})",[^]*?"title":"([^"]+)"/g;
+                        let matches;
+                        discoveredVideos = [];
+                        
+                        while ((matches = regex.exec(html)) !== null) {
+                            const fileId = matches[1];
+                            const fileName = matches[2];
+                            if (fileId !== folderId && fileName.toLowerCase().endsWith('.mp4')) {
+                                discoveredVideos.push({ id: fileId, name: fileName });
+                            }
+                        }
+                        renderVideoButtons();
+                    })
+                    .catch(e => {
+                        console.error("Mọi phương thức quét đều thất bại.", e);
+                        showFallbackLink(folderId);
+                    });
+            });
     }
-    
-    driveLink.style.display = "inline-block";[cite: 1]
-    driveLink.href = "https://drive.google.com/drive/folders/" + folderId;[cite: 1]
-}
+
+    // Hàm dựng danh sách nút bấm tương ứng các file quét được
+    function renderVideoButtons() {
+        const driveLink = document.getElementById('driveLink');
+        const container = document.getElementById('videoListContainer');
+        const dataLang = dictionary[currentLang];
+        container.innerHTML = "";
+
+        if (discoveredVideos.length > 0) {
+            driveLink.style.display = "none"; // Ẩn nút Drive gốc đi
+
+            discoveredVideos.forEach((file, index) => {
+                const directUrl = `https://docs.google.com/uc?export=download&id=${file.id}`;
+                
+                const btn = document.createElement('a');
+                btn.href = directUrl;
+                btn.className = "btn btn-drive";
+                btn.style.marginTop = "10px";
+                btn.style.background = "#2cb67d"; 
+                btn.style.boxShadow = "0 4px 15px rgba(44,182,125,0.3)";
+                btn.innerText = `🎬 ${dataLang.btnDownloadText} ${index + 1}`;
+                btn.setAttribute("download", file.name);
+                
+                const label = document.createElement('div');
+                label.innerText = file.name;
+                label.style.fontSize = "11px";
+                label.style.color = "#7f8c8d";
+                label.style.textAlign = "center";
+                label.style.marginTop = "3px";
+                label.style.marginBottom = "12px";
+
+                container.appendChild(btn);
+                container.appendChild(label);
+            });
+        } else {
+            showFallbackLink(currentFolderId, dataLang.emptyText);
+        }
+    }
+
+    function showFallbackLink(folderId, customMsg) {
+        const driveLink = document.getElementById('driveLink');
+        const container = document.getElementById('videoListContainer');
+        
+        if (customMsg) {
+            container.innerHTML = `<p style="font-size: 13.5px; color: #e53e3e; text-align: center; margin: 10px 0;">⚠️ ${customMsg}</p>`;
+        } else {
+            container.innerHTML = "";
+        }
+        
+        driveLink.style.display = "inline-block";[cite: 1]
+        driveLink.href = "https://drive.google.com/drive/folders/" + folderId;[cite: 1]
+    }
+
     function renderButtonUI() {
         const data = dictionary[currentLang];
         const driveLink = document.getElementById('driveLink');
@@ -304,6 +357,9 @@ function showFallbackLink(folderId, customMsg) {
             driveLink.classList.add('btn-danger'); 
             actionInst.innerHTML = "";
             actionInst.style.display = "none";
+            
+            // Nếu QR hết hạn, xóa luôn vùng hiển thị chờ video
+            document.getElementById('videoListContainer').innerHTML = "";
         }
     }
 
@@ -327,37 +383,46 @@ function showFallbackLink(folderId, customMsg) {
         document.getElementById('albumDate').innerText = `${data.date}: ${globalDay}`; 
         document.getElementById('noteContent').innerHTML = data.content;
 
+        // Cập nhật lại giao diện nút tải video nếu đã quét xong
+        const scanningMsg = document.getElementById('scanningMsg');
+        if (scanningMsg) {
+            scanningMsg.innerText = data.scanningText;
+        } else if (discoveredVideos.length > 0) {
+            renderVideoButtons();
+        } else if (discoveredVideos.length === 0 && currentFolderId) {
+            const container = document.getElementById('videoListContainer');
+            if (container.innerHTML !== "") {
+                container.innerHTML = `<p style="font-size: 13.5px; color: #e53e3e; text-align: center; margin: 10px 0;">⚠️ ${data.emptyText}</p>`;
+            }
+        }
+
         renderButtonUI();
     }
 
-    // Kiểm tra QR hết hạn dựa trên chuỗi ngày chụp dạng MMDD (ví dụ: 0717 -> Tháng 07 Ngày 17)
-function checkQrExpiry(dayRaw) {
-    try {
-        const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
-        if (digitsOnly.length < 4) return false; // Không đúng định dạng ngày
+    function checkQrExpiry(dayRaw) {
+        try {
+            const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
+            if (digitsOnly.length < 4) return false; 
 
-        // 🌟 Sửa lại cấu trúc cắt chuỗi theo định dạng MMDD
-        const month = parseInt(digitsOnly.substring(0, 2), 10) - 1; // Tháng trong JS tính từ 0-11
-        const day = parseInt(digitsOnly.substring(2, 4), 10);
-        const now = new Date();
-        
-        // Tạo mốc thời gian chụp dựa trên năm hiện tại
-        let photoDate = new Date(now.getFullYear(), month, day);
-        
-        // Nếu ngày chụp lớn hơn ngày hiện tại (vượt quá cuối năm trước sang năm mới), lùi lại 1 năm
-        if (photoDate > now) {
-            photoDate.setFullYear(now.getFullYear() - 1);
+            // Cấu trúc MMDD (Ví dụ: 0717 -> Tháng 07 ngày 17)
+            const month = parseInt(digitsOnly.substring(0, 2), 10) - 1; 
+            const day = parseInt(digitsOnly.substring(2, 4), 10);
+            const now = new Date();
+            
+            let photoDate = new Date(now.getFullYear(), month, day);
+            
+            if (photoDate > now) {
+                photoDate.setFullYear(now.getFullYear() - 1);
+            }
+
+            const diffTime = Math.abs(now - photoDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays > QR_EXPIRY_DAYS; 
+        } catch (e) {
+            return false; 
         }
-
-        // Tính số ngày đã trôi qua
-        const diffTime = Math.abs(now - photoDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        return diffDays > QR_EXPIRY_DAYS; // Trả về true nếu đã quá hạn 30 ngày
-    } catch (e) {
-        return false; // Nếu lỗi parse ngày, coi như chưa hết hạn để khách vẫn bấm được
     }
-}
 
     function decodeAdvanced(base64) {
         let str = base64.replace(/-/g, '+').replace(/_/g, '/');
@@ -391,8 +456,6 @@ function checkQrExpiry(dayRaw) {
                 currentFolderId = parts[4];       
                 const scriptId = parts[5];       
                 currentSecretToken = parts[6];
-                
-                setupDirectDownloadButton(currentFolderId);
 
                 const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
                 let finalDayStr = digitsOnly.substring(0, 4);
@@ -409,9 +472,11 @@ function checkQrExpiry(dayRaw) {
                 if (!currentFolderId || currentFolderId === "undefined") {
                     buttonState = "not_found";
                 } else if (checkQrExpiry(dayRaw)) {
-                    buttonState = "not_found"; // Báo lỗi/hết hạn nếu đã quá 30 ngày
+                    buttonState = "not_found"; 
                 } else {
-                    buttonState = "ready"; // Luôn sẵn sàng tải về
+                    buttonState = "ready"; 
+                    // 🚀 Chỉ quét lấy danh sách video nếu QR còn hợp lệ
+                    setupDirectDownloadButton(currentFolderId);
                 }
                 
                 switchLang(currentLang);
