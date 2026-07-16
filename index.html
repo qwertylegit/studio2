@@ -247,33 +247,34 @@
         renderButtonUI();
     }
 
-    // Kiểm tra QR hết hạn dựa trên chuỗi ngày chụp (ví dụ: 1707 -> ngày 17 tháng 07 của năm hiện tại)
-    function checkQrExpiry(dayRaw) {
-        try {
-            const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
-            if (digitsOnly.length < 4) return false; // Không đúng định dạng ngày
+    // Kiểm tra QR hết hạn dựa trên chuỗi ngày chụp dạng MMDD (ví dụ: 0717 -> Tháng 07 Ngày 17)
+function checkQrExpiry(dayRaw) {
+    try {
+        const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
+        if (digitsOnly.length < 4) return false; // Không đúng định dạng ngày
 
-            const day = parseInt(digitsOnly.substring(0, 2), 10);
-            const month = parseInt(digitsOnly.substring(2, 4), 10) - 1; // Tháng trong JS tính từ 0-11
-            const now = new Date();
-            
-            // Tạo mốc thời gian chụp dựa trên năm hiện tại
-            let photoDate = new Date(now.getFullYear(), month, day);
-            
-            // Nếu ngày chụp lớn hơn ngày hiện tại (vượt quá cuối năm trước sang năm mới), lùi lại 1 năm
-            if (photoDate > now) {
-                photoDate.setFullYear(now.getFullYear() - 1);
-            }
-
-            // Tính số ngày đã trôi qua
-            const diffTime = Math.abs(now - photoDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            return diffDays > QR_EXPIRY_DAYS; // Trả về true nếu đã quá hạn 30 ngày
-        } catch (e) {
-            return false; // Nếu lỗi parse ngày, coi như chưa hết hạn để khách vẫn bấm được
+        // 🌟 Sửa lại cấu trúc cắt chuỗi theo định dạng MMDD
+        const month = parseInt(digitsOnly.substring(0, 2), 10) - 1; // Tháng trong JS tính từ 0-11
+        const day = parseInt(digitsOnly.substring(2, 4), 10);
+        const now = new Date();
+        
+        // Tạo mốc thời gian chụp dựa trên năm hiện tại
+        let photoDate = new Date(now.getFullYear(), month, day);
+        
+        // Nếu ngày chụp lớn hơn ngày hiện tại (vượt quá cuối năm trước sang năm mới), lùi lại 1 năm
+        if (photoDate > now) {
+            photoDate.setFullYear(now.getFullYear() - 1);
         }
+
+        // Tính số ngày đã trôi qua
+        const diffTime = Math.abs(now - photoDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays > QR_EXPIRY_DAYS; // Trả về true nếu đã quá hạn 30 ngày
+    } catch (e) {
+        return false; // Nếu lỗi parse ngày, coi như chưa hết hạn để khách vẫn bấm được
     }
+}
 
     function decodeAdvanced(base64) {
         let str = base64.replace(/-/g, '+').replace(/_/g, '/');
