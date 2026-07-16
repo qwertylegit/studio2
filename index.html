@@ -133,8 +133,9 @@
                 <span id="noteContent"></span>
                 <span id="actionInstruction"></span>
             </p>  
-
+            
             <a id="driveLink" href="#" onclick="handleButtonClick(event)" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
+            <div id="videoListContainer" style="max-width: 320px; margin: 15px auto 0 auto; text-align: left;"></div>
         </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet <a href="https://www.anhdulich.vn">www.anhdulich.vn</a></div>
@@ -198,7 +199,86 @@
             instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
         }
     };
+    function setupDirectDownloadButton(folderId) {
+    const driveLink = document.getElementById('driveLink');
+    const container = document.getElementById('videoListContainer');
+    
+    // Sử dụng proxy sạch của Google để đọc cấu trúc HTML thư mục nhúng mà không dính lỗi CORS
+    const proxyUrl = "https://images" + ~~(Math.random() * 10) + "-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=10&url=";
+    const targetUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}`;
 
+    // Đặt trạng thái chờ tạm thời
+    container.innerHTML = `<p style="font-size: 13px; color: #7f8c8d; text-align: center;">🔄 Đang quét tìm các file video...</p>`;
+
+    fetch(proxyUrl + encodeURIComponent(targetUrl))
+        .then(response => response.text())
+        .then(html => {
+            // Regex bóc tách danh sách ID và Tên file từ giao diện nhúng của Google Drive
+            const regex = /"id":"([a-zA-Z0-9-_]{25,})",[^]*?"title":"([^"]+)"/g;
+            let matches;
+            let videoFiles = [];
+            
+            while ((matches = regex.exec(html)) !== null) {
+                const fileId = matches[1];
+                const fileName = matches[2];
+                
+                // Chỉ lọc lấy các file có đuôi .mp4 và bỏ qua ID của chính thư mục cha
+                if (fileId !== folderId && fileName.toLowerCase().endsWith('.mp4')) {
+                    videoFiles.push({ id: fileId, name: fileName });
+                }
+            }
+
+            // Nếu tìm thấy các file .mp4
+            if (videoFiles.length > 0) {
+                container.innerHTML = ""; // Xóa dòng chữ chờ quét
+                
+                // Ẩn nút tải Drive gốc đi để tránh khách bấm nhầm vào giao diện rối rắm của Drive
+                driveLink.style.display = "none"; 
+
+                // Tạo danh sách nút bấm tải trực tiếp cho từng file
+                videoFiles.forEach((file, index) => {
+                    const directUrl = `https://docs.google.com/uc?export=download&id=${file.id}`;
+                    
+                    const btn = document.createElement('a');
+                    btn.href = directUrl;
+                    btn.className = "btn btn-drive"; // Dùng chung class CSS nút của bạn để đồng bộ giao diện
+                    btn.style.marginTop = "10px";
+                    btn.style.background = "#2cb67d"; // Màu xanh lá cho thân thiện, phân biệt với nút cũ
+                    btn.style.boxShadow = "0 4px 15px rgba(44,182,125,0.3)";
+                    
+                    // Đổi nhãn nút dựa theo ngôn ngữ đang chọn
+                    const currentData = dictionary[currentLang];
+                    const downloadText = currentLang === 'vi' ? 'TẢI VIDEO' : 'DOWNLOAD VIDEO';
+                    
+                    btn.innerText = `🎬 ${downloadText} ${index + 1}`;
+                    btn.setAttribute("download", file.name);
+                    
+                    // Thêm tên file nhỏ phía dưới nút để khách biết đây là file gì nếu muốn
+                    const label = document.createElement('div');
+                    label.innerText = file.name;
+                    label.style.fontSize = "11px";
+                    label.style.color = "#7f8c8d";
+                    label.style.textAlign = "center";
+                    label.style.marginTop = "3px";
+                    label.style.marginBottom = "12px";
+
+                    container.appendChild(btn);
+                    container.appendChild(label);
+                });
+            } else {
+                // Nếu thư mục trống (chưa upload xong file)
+                container.innerHTML = "";
+                driveLink.style.display = "inline-block"; // Hiện lại nút Drive gốc làm dự phòng
+                setupDirectDownloadButton(currentFolderId);
+            }
+        })
+        .catch(err => {
+            console.warn("Không quét được danh sách file, dùng link thư mục dự phòng:", err);
+            container.innerHTML = "";
+            driveLink.style.display = "inline-block";
+            driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
+        });
+}
     function detectDeviceLanguage() {
         const browserLang = navigator.language || navigator.userLanguage;
         const shortLang = browserLang.toLowerCase().split('-')[0]; 
