@@ -208,37 +208,32 @@
     const driveLink = document.getElementById('driveLink');
     const container = document.getElementById('videoListContainer');
     
-    // Sử dụng proxy sạch của Google để đọc cấu trúc HTML thư mục nhúng mà không dính lỗi CORS
-    const proxyUrl = "https://images" + ~~(Math.random() * 10) + "-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=10&url=";
-    const targetUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}`;
+    // Đặt trạng thái chờ quét
+    container.innerHTML = `<p style="font-size: 13.5px; color: #7f8c8d; text-align: center; margin: 15px 0;">🔄 Đang quét tìm các file video...</p>`;
 
-    // Đặt trạng thái chờ tạm thời
-    container.innerHTML = `<p style="font-size: 13px; color: #7f8c8d; text-align: center;">🔄 Đang quét tìm các file video...</p>`;
+    // Sử dụng API công cộng của Google Drive để lấy danh sách file trong thư mục công khai
+    const fields = "files(id,name,mimeType)";
+    const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&fields=${encodeURIComponent(fields)}&key=`; 
+    // Mẹo nhỏ: Google cho phép đọc metadata của thư mục công khai (Anyone with link) qua API này mà không cần API Key 
+    // trong một số trường hợp, hoặc bạn có thể tạo 1 API Key miễn phí trên Google Cloud Console dán vào đuôi &key=API_KEY để ổn định tuyệt đối.
 
-    fetch(proxyUrl + encodeURIComponent(targetUrl))
-        .then(response => response.text())
-        .then(html => {
-            // Regex bóc tách danh sách ID và Tên file từ giao diện nhúng của Google Drive
-            const regex = /"id":"([a-zA-Z0-9-_]{25,})",[^]*?"title":"([^"]+)"/g;
-            let matches;
-            let videoFiles = [];
-            
-            while ((matches = regex.exec(html)) !== null) {
-                const fileId = matches[1];
-                const fileName = matches[2];
-                
-                // Chỉ lọc lấy các file có đuôi .mp4 và bỏ qua ID của chính thư mục cha
-                if (fileId !== folderId && fileName.toLowerCase().endsWith('.mp4')) {
-                    videoFiles.push({ id: fileId, name: fileName });
-                }
-            }
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) throw new Error("API Limit or Private Folder");
+            return response.json();
+        })
+        .then(data => {
+            const files = data.files || [];
+            // Lọc ra các file có đuôi .mp4 hoặc mimeType là video
+            const videoFiles = files.filter(file => {
+                const name = file.name.toLowerCase();
+                const mime = file.mimeType ? file.mimeType.toLowerCase() : "";
+                return name.endsWith('.mp4') || mime.includes('video/mp4');
+            });
 
-            // Nếu tìm thấy các file .mp4
             if (videoFiles.length > 0) {
                 container.innerHTML = ""; // Xóa dòng chữ chờ quét
-                
-                // Ẩn nút tải Drive gốc đi để tránh khách bấm nhầm vào giao diện rối rắm của Drive
-                driveLink.style.display = "none"; 
+                driveLink.style.display = "none"; // Ẩn nút Drive gốc để khách không bị rối
 
                 // Tạo danh sách nút bấm tải trực tiếp cho từng file
                 videoFiles.forEach((file, index) => {
@@ -246,43 +241,52 @@
                     
                     const btn = document.createElement('a');
                     btn.href = directUrl;
-                    btn.className = "btn btn-drive"; // Dùng chung class CSS nút của bạn để đồng bộ giao diện
+                    btn.className = "btn btn-drive"; // Dùng chung class CSS cũ của bạn[cite: 1]
                     btn.style.marginTop = "10px";
-                    btn.style.background = "#2cb67d"; // Màu xanh lá cho thân thiện, phân biệt với nút cũ
-                    btn.style.boxShadow = "0 4px 15px rgba(44,182,125,0.3)";
+                    btn.style.background = "#2cb67d"; // Màu xanh lá bắt mắt[cite: 1]
+                    btn.style.boxShadow = "0 4px 15px rgba(44,182,125,0.3)";[cite: 1]
                     
-                    // Đổi nhãn nút dựa theo ngôn ngữ đang chọn
-                    const currentData = dictionary[currentLang];
-                    const downloadText = currentLang === 'vi' ? 'TẢI VIDEO' : 'DOWNLOAD VIDEO';
+                    const downloadText = currentLang === 'vi' ? 'TẢI VIDEO' : 'DOWNLOAD VIDEO';[cite: 1]
+                    btn.innerText = `🎬 ${downloadText} ${index + 1}`;[cite: 1]
+                    btn.setAttribute("download", file.name);[cite: 1]
                     
-                    btn.innerText = `🎬 ${downloadText} ${index + 1}`;
-                    btn.setAttribute("download", file.name);
-                    
-                    // Thêm tên file nhỏ phía dưới nút để khách biết đây là file gì nếu muốn
+                    // Thêm tên file nhỏ phía dưới nút
                     const label = document.createElement('div');
                     label.innerText = file.name;
                     label.style.fontSize = "11px";
                     label.style.color = "#7f8c8d";
                     label.style.textAlign = "center";
                     label.style.marginTop = "3px";
-                    label.style.marginBottom = "12px";
+                    label.style.marginBottom = "12px";[cite: 1]
 
                     container.appendChild(btn);
                     container.appendChild(label);
                 });
             } else {
-                // Nếu thư mục trống (chưa upload xong file)
-                container.innerHTML = "";
-                driveLink.style.display = "inline-block"; // Hiện lại nút Drive gốc làm dự phòng
-                driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
+                // Thư mục trống (chưa upload xong file)
+                showFallbackLink(folderId, "Thư mục hiện chưa có file video nào.");
             }
         })
         .catch(err => {
-            console.warn("Không quét được danh sách file, dùng link thư mục dự phòng:", err);
-            container.innerHTML = "";
-            driveLink.style.display = "inline-block";
-            driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
+            // Nếu API bị chặn CORS hoặc thư mục chưa chia sẻ công khai "Bất kỳ ai có liên kết đều xem được"
+            console.warn("Lỗi quét API, chuyển sang dùng link dự phòng:", err);
+            showFallbackLink(folderId);
         });
+}
+
+// Hàm hiển thị nút dự phòng dắt khách về thẳng thư mục Drive gốc
+function showFallbackLink(folderId, customMsg) {
+    const driveLink = document.getElementById('driveLink');
+    const container = document.getElementById('videoListContainer');
+    
+    if (customMsg) {
+        container.innerHTML = `<p style="font-size: 13px; color: #e53e3e; text-align: center; margin: 10px 0;">⚠️ ${customMsg}</p>`;
+    } else {
+        container.innerHTML = "";
+    }
+    
+    driveLink.style.display = "inline-block";[cite: 1]
+    driveLink.href = "https://drive.google.com/drive/folders/" + folderId;[cite: 1]
 }
     function renderButtonUI() {
         const data = dictionary[currentLang];
