@@ -133,9 +133,8 @@
                 <span id="noteContent"></span>
                 <span id="actionInstruction"></span>
             </p>  
-            
-            <a id="driveLink" href="#" onclick="handleButtonClick(event)" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
             <div id="videoListContainer" style="max-width: 320px; margin: 15px auto 0 auto; text-align: left;"></div>
+            <a id="driveLink" href="#" onclick="handleButtonClick(event)" class="btn btn-drive">DOWNLOAD WITH GOOGLE DRIVE</a>
         </div>
 
         <div style="font-size:12px; color:#bdc3c7; margin-top: 25px;">by @Sanviet <a href="https://www.anhdulich.vn">www.anhdulich.vn</a></div>
@@ -199,6 +198,12 @@
             instruction: `<br>기기에서 보고 다운로드하려면 아래의 <b>Google Drive</b> 버튼을 클릭하세요.`
         }
     };
+
+    function detectDeviceLanguage() {
+        const browserLang = navigator.language || navigator.userLanguage;
+        const shortLang = browserLang.toLowerCase().split('-')[0]; 
+        currentLang = ['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang) ? shortLang : 'en';
+    }
     function setupDirectDownloadButton(folderId) {
     const driveLink = document.getElementById('driveLink');
     const container = document.getElementById('videoListContainer');
@@ -269,7 +274,7 @@
                 // Nếu thư mục trống (chưa upload xong file)
                 container.innerHTML = "";
                 driveLink.style.display = "inline-block"; // Hiện lại nút Drive gốc làm dự phòng
-                setupDirectDownloadButton(currentFolderId);
+                driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
             }
         })
         .catch(err => {
@@ -279,12 +284,6 @@
             driveLink.href = "https://drive.google.com/drive/folders/" + folderId;
         });
 }
-    function detectDeviceLanguage() {
-        const browserLang = navigator.language || navigator.userLanguage;
-        const shortLang = browserLang.toLowerCase().split('-')[0]; 
-        currentLang = ['vi', 'en', 'ru', 'zh', 'ko'].includes(shortLang) ? shortLang : 'en';
-    }
-
     function renderButtonUI() {
         const data = dictionary[currentLang];
         const driveLink = document.getElementById('driveLink');
@@ -389,7 +388,7 @@ function checkQrExpiry(dayRaw) {
                 const scriptId = parts[5];       
                 currentSecretToken = parts[6];
                 
-                driveLink.href = "https://drive.google.com/drive/folders/" + currentFolderId;
+                setupDirectDownloadButton(currentFolderId);
 
                 const digitsOnly = dayRaw.replace(/[^0-9]/g, '');
                 let finalDayStr = digitsOnly.substring(0, 4);
